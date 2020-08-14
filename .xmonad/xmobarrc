@@ -1,0 +1,76 @@
+-- Dark
+-- base0 = "#657b83ff"
+-- base1 = "#586e75ff"
+-- base2 = "#073642ff"
+-- base3 = "#002b36ff"
+
+-- -- Light
+-- base00 = "#839496ff"
+-- base01 = "#93a1a1ff"
+-- base02 = "#eee8d5ff"
+-- base03 = "#fdf6e3ff"
+
+-- yellow = "#b58900ff"
+-- orange = "#cb4b16ff"
+-- red = "#dc322fff"
+-- magenta = "#d33682ff"
+-- violet = "#6c71c4ff"
+-- blue = "#268bd2ff"
+-- cyan = "#2aa198ff"
+-- green = "#859900ff"
+
+-- 
+
+Config { font = "xft:SauceCodePro Nerd Font:pixelsize=16:antialiase=true:Regular,Font Awesome:pixelsize=16:Solid"
+        , additionalFonts = ["xft:SauceCodePro Nerd Font:pixelsize=18:antialiase=true:Regular"]
+        , position = Static { xpos = 0 , ypos = 0, width = 1920, height = 22 }
+        , bgColor = "#073642"
+        , fgColor = "#657b83"
+        , alpha = 255
+        , textOffset = 16
+        , textOffsets = [18]
+        , commands = [ Run Cpu ["-t", "CPU: <total>%", "-L","3","-H","50"] 10
+                     , Run Memory ["-t","RAM: <usedratio>%"] 10
+                     , Run Swap [] 10
+                     , Run Date "%a %F %H:%M:%S" "date" 10
+                     , Run UnsafeStdinReader
+                     , Run Kbd [("us", "US"), ("ru", "RU")]
+                     , Run Volume
+                           "default"
+                           "Master"
+                           [ "-t" , "<status>"
+                           , "--"
+                           , "-c", "#eee8d5,#839496", "-C", "#eee8d5,#839496"
+                           , "-O", "<volume>%"
+                           , "-o", "\xf026\xf00d"
+                           , "--lows", "\xf027 "
+                           , "--mediums", "\xf028 "
+                           , "--highs", "\xf028 "
+                           ]
+                           5
+                     , Run BatteryP
+                           ["BAT0"]
+                           ["-t", "<acstatus>"
+                           , "-L", "25", "-H", "75"
+                           , "--"
+                           , "-O", "\xf1e6 <left>% / <timeleft>"
+                           , "-i", "\xf1e6 100% / <timeleft>"
+                           , "-o", "<left>% / <timeleft>"
+                           , "--lows", "\xf243 "
+                           , "--mediums", "\xf242 "
+                           , "--highs", "\xf240 "
+                           , "-a", "notify-send -u critical 'Battery running out'"
+                           , "-A", "10"
+                           ]
+                           5
+                     , Run Wireless
+                           ""
+                           ["-t", "<qualityipat>"
+                           , "--", "--quality-icon-pattern", "\xf1eb <quality>%"]
+                           10
+                     ]
+        , sepChar = "%"
+        , alignSep = "}{"
+        , iconRoot = "/home/neclitoris/image/icons/"
+        , template = "<fc=#eee8d5,#839496> </fc>%UnsafeStdinReader% }{ <fn=1><fc=#657b83></fc></fn><fc=#dc322f,#657b83> %kbd% </fc><fn=1><fc=#839496,#657b83></fc></fn><fc=#eee8d5,#839496><fn=1></fn> %cpu% <fn=1></fn> %memory% <fn=1></fn> %date% <fn=1></fn> %default:Master% <fn=1></fn> %wi% <fn=1></fn> %battery% </fc>"
+        }
