@@ -15,6 +15,7 @@ import           System.IO
 
 import           XMonad
 import qualified XMonad.Actions.TreeSelect     as TS
+import           XMonad.Config.Gnome
 import           XMonad.Hooks.DynamicLog
 import           XMonad.Hooks.EwmhDesktops
 import           XMonad.Hooks.ManageDocks
@@ -62,7 +63,7 @@ colorToStr :: Word64 -> String
 colorToStr = ('#' :) . drop 2 . (`showHex` "")
 
 terminalEmulator :: String
-terminalEmulator = "gnome-terminal"
+terminalEmulator = "alacritty"
 
 data AllFloats = AllFloats deriving (Read, Show)
 
@@ -89,7 +90,7 @@ getTmuxSessions = do
     retry = runProcessWithInput
                     "tmux"
                     [ "start"
-                   , ";"
+                    , ";"
                     , "run-shell"
                     , "~/.tmux/plugins/tmux-resurrect/scripts/restore.sh"
                     , ";"
@@ -98,7 +99,7 @@ getTmuxSessions = do
                     ""
 
 myXPConfig :: XP.XPConfig
-myXPConfig = def { XP.font = "xft:Source Code Pro-16"
+myXPConfig = def { XP.font = "xft:Source Code Pro for Powerline:size=16"
                  , XP.bgColor = colorToStr base2
                  , XP.fgColor = colorToStr base0
                  , XP.bgHLight = colorToStr base00
@@ -110,7 +111,7 @@ myXPConfig = def { XP.font = "xft:Source Code Pro-16"
                  }
 
 myTSConfig :: TS.TSConfig a
-myTSConfig = TS.tsDefaultConfig { TS.ts_font = "xft:Source Code Pro-12"
+myTSConfig = TS.tsDefaultConfig { TS.ts_font = "xft:Source Code Pro for Powerline:size=12"
                                         , TS.ts_background = base2 - 0x3f000000
                                         , TS.ts_highlight  = (base03, base00)
                                         , TS.ts_node       = (base0, base2)
@@ -150,16 +151,16 @@ myTreeSelect = do
     -- quicklaunch tab
     commonApps =
         [ ("firefox" , "firefox")
-        , ("telegram", "telegram")
+        , ("telegram", "telegram-desktop")
         , ("discord" , "discord")
         , ("steam"   , "steam")
         , ("gimp"    , "gimp")
         ]
     -- power tab
     powerComs =
-        [ ("shutdown"   , "systemctl poweroff")
-        , ("reboot"     , "systemctl reboot")
-        , ("suspend", printf "systemctl suspend && %s" screenLocker)
+        [ ("shutdown"   , "loginctl poweroff")
+        , ("reboot"     , "loginctl reboot")
+        , ("suspend", "loginctl suspend")
         , ("lock screen", screenLocker)
         ]
     -- tmux tab
@@ -199,9 +200,9 @@ myKeymap =
     , ("M-S-x", XP.xmonadPrompt myXPConfig)
     , ("C-M1-h", withFocused hideWindow)
     , ("C-M1-p", popOldestHiddenWindow)
-    , ("<XF86AudioRaiseVolume>" , spawn "pactl set-sink-volume @DEFAULT_SINK@ +1.5%")
-    , ("<XF86AudioLowerVolume>" , spawn "pactl set-sink-volume @DEFAULT_SINK@  -1.5%")
-    , ("<XF86AudioMute>", spawn "pactl set-sink-mute @DEFAULT_SINK@ toggle")
+    , ("<XF86AudioRaiseVolume>" , spawn "amixer set Master 1%+")
+    , ("<XF86AudioLowerVolume>" , spawn "amixer set Master 1%-")
+    , ("<XF86AudioMute>", spawn "amixer set Master toggle")
     , ("<XF86MonBrightnessUp>", spawn "bright Up")
     , ("<XF86MonBrightnessDown>", spawn "bright Down")
     ]

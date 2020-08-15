@@ -121,6 +121,7 @@ let g:ycm_semantic_triggers.tex = g:vimtex#re#youcompleteme
 let g:vimtex_compiler_progname = 'nvr'
 let g:vimtex_view_method = 'zathura'
 let g:tex_conceal=''
+let g:tex_flavor = 'latex'
 
 let g:ycm_semantic_triggers.haskell = ['.']
 " let g:necoghc_enable_detailed_browse = 0
@@ -188,16 +189,14 @@ set conceallevel=1
 set concealcursor="nc"
 
 " Cursor style
-if has("autocmd")
-    au VimEnter,InsertLeave * silent execute '!echo -ne "\e[4 q"' | redraw!
-    au InsertEnter,InsertChange *
-        \ if v:insertmode == 'i' |
-        \   silent execute '!echo -ne "\e[5 q"' | redraw! |
-        \ elseif v:insertmode == 'r' |
-        \   silent execute '!echo -ne "\e[1 q"' | redraw! |
-        \ endif
-    au VimLeave * silent execute '!echo -ne "\e[ q"' | redraw!
-endif
+" au VimEnter,InsertLeave * silent execute '!echo -ne "\e[4 q"' | redraw!
+" au InsertEnter,InsertChange *
+    " \ if v:insertmode == 'i' |
+    " \   silent execute '!echo -ne "\e[5 q"' | redraw! |
+    " \ elseif v:insertmode == 'r' |
+    " \   silent execute '!echo -ne "\e[1 q"' | redraw! |
+    " \ endif
+" au VimLeave * silent execute '!echo -ne "\e[ q"' | redraw!
 
 " Cursor settings:
 
