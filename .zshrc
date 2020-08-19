@@ -25,4 +25,3 @@ autoload -U +X bashcompinit && bashcompinit
 source "$HOME/.completions/tldr"
 
 setopt nosharehistory
-

@@ -20,7 +20,6 @@ import           XMonad.Hooks.DynamicLog
 import           XMonad.Hooks.EwmhDesktops
 import           XMonad.Hooks.ManageDocks
 import           XMonad.Hooks.ManageHelpers
-import           XMonad.Layout.Gaps
 import           XMonad.Layout.NoBorders
 import           XMonad.Layout.ResizableTile
 import           XMonad.Layout.Spacing
@@ -138,7 +137,7 @@ myTreeSelect = do
     let tree =  [ Node (TS.TSNode "quicklaunch" "some regularly used apps" (return ()))
                      (map (\(name, com) -> Node (TS.TSNode name "" (spawn com)) []) commonApps)
                 , Node (TS.TSNode "desktop" "" (return ()))
-                     (map (\file -> Node (TS.TSNode (desktopName file) "" (spawn ("xdg-open " ++ file))) []) desktopFiles)
+                     (map (\file -> Node (TS.TSNode (desktopName file) "" (spawn ("dex " ++ file))) []) desktopFiles)
                 , Node (TS.TSNode "tmux" "current tmux sessions" (return ()))
                      (map (\s -> Node (TS.TSNode s "" (attachSession s)) (manipSession s)) tmuxSessions)
                 , Node (TS.TSNode "power" "" (return ()))
@@ -160,7 +159,7 @@ myTreeSelect = do
     powerComs =
         [ ("shutdown"   , "loginctl poweroff")
         , ("reboot"     , "loginctl reboot")
-        , ("suspend", "loginctl suspend")
+        , ("suspend"    , printf "loginctl suspend && %s" screenLocker)
         , ("lock screen", screenLocker)
         ]
     -- tmux tab
@@ -200,8 +199,8 @@ myKeymap =
     , ("M-S-x", XP.xmonadPrompt myXPConfig)
     , ("C-M1-h", withFocused hideWindow)
     , ("C-M1-p", popOldestHiddenWindow)
-    , ("<XF86AudioRaiseVolume>" , spawn "amixer set Master 1%+")
-    , ("<XF86AudioLowerVolume>" , spawn "amixer set Master 1%-")
+    , ("<XF86AudioRaiseVolume>" , spawn "amixer set Master 3%+")
+    , ("<XF86AudioLowerVolume>" , spawn "amixer set Master 3%-")
     , ("<XF86AudioMute>", spawn "amixer set Master toggle")
     , ("<XF86MonBrightnessUp>", spawn "bright Up")
     , ("<XF86MonBrightnessDown>", spawn "bright Down")
@@ -229,8 +228,7 @@ myLayoutHook =
     hiddenWindows
         $   lessBorders OnlyScreenFloat
         $   avoidStruts
-        $   gaps [(U, 1), (R, 1), (D, 1), (L, 1)]
-        $   spacingRaw False (Border 0 0 0 0) True (Border 2 2 2 2) True
+        $   spacingRaw False (Border 1 5 5 5) True (Border 3 3 3 3) True
         $   tall ||| Mirror tall ||| Full ||| spiral (6 / 7)
     where tall = Tall 1 (3/100) (1/2)
 

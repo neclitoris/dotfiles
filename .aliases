@@ -3,3 +3,4 @@ alias diff='diff --color=always'
 alias grep='grep --color=always'
 alias xclip=xclip -selection clipboard
 alias config='git --git-dir=$HOME/dotfiles --work-tree=$HOME'
+alias sudo='sudo -E'
