@@ -54,7 +54,7 @@ let g:startify_custom_header =
 
 " YCM
 let g:ycm_use_clangd = 1
-let g:ycm_clangd_binary_path = "/usr/local/bin/clangd"
+let g:ycm_clangd_binary_path = "/usr/bin/clangd"
 let g:ycm_autoclose_preview_window_after_completion = 1
 let g:ycm_global_ycm_extra_conf = "~/.ycm_extra_conf.py"
 let g:ycm_extra_conf_globlist = ["~/doc/programming/*"]
@@ -67,6 +67,7 @@ let g:airline_powerline_fonts = 1
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#keymap#enabled = 0
 let g:airline#extensions#xkblayout#enabled = 0
+let g:airline#extensions#tmuxline#enabled = 0
 
 " DelimitMate
 " let delimitMate_expand_cr = 1
@@ -158,7 +159,7 @@ set modelines=0
 
 " Show line numbers
 set number
-set relativenumber
+" set relativenumber
 
 " Show file stats
 set ruler

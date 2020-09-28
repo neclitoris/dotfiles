@@ -159,7 +159,7 @@ myTreeSelect = do
     powerComs =
         [ ("shutdown"   , "loginctl poweroff")
         , ("reboot"     , "loginctl reboot")
-        , ("suspend"    , printf "loginctl suspend && %s" screenLocker)
+        , ("suspend"    , printf "(%s&) && sleep 1 && loginctl suspend" screenLocker)
         , ("lock screen", screenLocker)
         ]
     -- tmux tab
@@ -168,7 +168,7 @@ myTreeSelect = do
         , Node (TS.TSNode "rename" "" (renameSession s)) []
         , Node (TS.TSNode "kill" "" (killSession s))     []
         ]
-    attachSession s = runInTerm "" (printf "'tmux attach-session -t %s'" s)
+    attachSession s = runInTerm "" (printf "tmux attach-session -t %s" s)
     killSession s = spawn (printf "tmux kill-session -t %s" s)
     renameSession s = XP.mkXPrompt TmuxRenamePrompt myXPConfig (XP.mkComplFunFromList []) (spawn . printf "tmux rename-session -t %s %s" s)
 
@@ -177,19 +177,19 @@ myKeymap =
     [ ("M-h", sendMessage Shrink)
     , ("M-l", sendMessage Expand)
     , ("C-M1-l"    , spawn screenLocker)
-    , ("<Print>"   , spawn "maim $(date +\"$HOME/image/Screenshots/%FT%T.png\")")
-    , ("M1-<Print>", spawn "maim -i $(xdotool getactivewindow) $(date +\"$HOME/image/Screenshots/%FT%T.png\")")
+    , ("<Print>"   , spawn "maim -u $(date +\"$HOME/image/Screenshots/%FT%T.png\")")
+    , ("M1-<Print>", spawn "maim -u -i $(xdotool getactivewindow) $(date +\"$HOME/image/Screenshots/%FT%T.png\")")
     , ( "S-<Print>"
-      , spawn "maim -s $(date +\"$HOME/image/Screenshots/%FT%T.png\")"
+      , spawn "maim -u -s $(date +\"$HOME/image/Screenshots/%FT%T.png\")"
       )
     , ( "C-<Print>"
-      , spawn "maim | tee /tmp/img.png | xclip -target image/png -sel clipboard"
+      , spawn "maim -u | tee /tmp/img.png | xclip -target image/png -sel clipboard"
       )
     , ( "C-M1-<Print>"
-      , spawn "maim -i $(xdotool getactivewindow) | tee /tmp/img.png | xclip -target image/png -sel clipboard"
+      , spawn "maim -u -i $(xdotool getactivewindow) | tee /tmp/img.png | xclip -target image/png -sel clipboard"
       )
     , ( "C-S-<Print>"
-      , spawn "maim -s | tee /tmp/img.png | xclip -target image/png -sel clipboard"
+      , spawn "maim -u -s | tee /tmp/img.png | xclip -target image/png -sel clipboard"
       )
     , ( "M-f"
       , withFocused (flip tileWindow $ Rectangle 0 0 1920 1080)

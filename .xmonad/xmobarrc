@@ -21,7 +21,7 @@
 
 -- 
 
-Config { font = "xft:Source Code Pro for Powerline:pixelsize=16:antialiase=true:Regular,Font Awesome 5 Free:pixelsize=16"
+Config { font = "xft:Source Code Pro for Powerline:pixelsize=16:antialiase=true:Regular,FontAwesome:pixelsize=16"
         , additionalFonts = ["xft:Source Code Pro for Powerline:pixelsize=18:antialiase=true:Regular"]
         , position = Static { xpos = 0 , ypos = 0, width = 1920, height = 22 }
         , bgColor = "#073642"
