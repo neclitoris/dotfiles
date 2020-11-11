@@ -23,7 +23,7 @@
 
 Config { font = "xft:Source Code Pro for Powerline:pixelsize=16:antialiase=true:Regular,FontAwesome:pixelsize=16"
         , additionalFonts = ["xft:Source Code Pro for Powerline:pixelsize=18:antialiase=true:Regular"]
-        , position = Static { xpos = 0 , ypos = 0, width = 1920, height = 22 }
+        , position = Static { xpos = 0 , ypos = 0, width = 1810, height = 22 }
         , bgColor = "#073642"
         , fgColor = "#657b83"
         , alpha = 255
@@ -72,5 +72,5 @@ Config { font = "xft:Source Code Pro for Powerline:pixelsize=16:antialiase=true:
         , sepChar = "%"
         , alignSep = "}{"
         , iconRoot = "/home/neclitoris/image/icons/"
-        , template = "<fc=#eee8d5,#839496> </fc>%UnsafeStdinReader% }{ <fn=1><fc=#657b83></fc></fn><fc=#dc322f,#657b83> %kbd% </fc><fn=1><fc=#839496,#657b83></fc></fn><fc=#eee8d5,#839496><fn=1></fn> %cpu% <fn=1></fn> %memory% <fn=1></fn> %date% <fn=1></fn> %default:Master% <fn=1></fn> %wi% <fn=1></fn> %battery% </fc>"
+        , template = "<fc=#eee8d5,#839496> </fc>%UnsafeStdinReader% }{ <fn=1><fc=#657b83></fc></fn><fc=#dc322f,#657b83> %kbd% </fc><fn=1><fc=#839496,#657b83></fc></fn><fc=#eee8d5,#839496><fn=1></fn> %cpu% <fn=1></fn> %memory% <fn=1></fn> %date% <fn=1></fn> %default:Master% <fn=1></fn> %wi% <fn=1></fn> %battery% <fn=1></fn></fc>"
         }

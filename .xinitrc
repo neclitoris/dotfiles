@@ -9,5 +9,6 @@ xsetroot -cursor_name left_ptr
 [[ -f ~/.Xresources ]] && xrdb -merge -I$HOME ~/.Xresources
 picom --backend glx -fcCz -m 1.0 -D 5 --shadow-exclude '!focused' &
 feh --bg-max ~/image/Wallpapers/rope\ giant.png &
+stalonetray &
 xhost +si:localuser:root
 exec dbus-launch --exit-with-session xmonad
