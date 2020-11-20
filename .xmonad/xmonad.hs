@@ -1,3 +1,4 @@
+{-# LANGUAGE TypeSynonymInstances, DeriveDataTypeable, FunctionalDependencies #-}
 import           Control.Exception
 import           Control.Monad
 import           Data.Default
@@ -20,6 +21,8 @@ import           XMonad.Hooks.DynamicLog
 import           XMonad.Hooks.EwmhDesktops
 import           XMonad.Hooks.ManageDocks
 import           XMonad.Hooks.ManageHelpers
+import           XMonad.Layout.MultiToggle
+import           XMonad.Layout.MultiToggle.Instances
 import           XMonad.Layout.NoBorders
 import           XMonad.Layout.ResizableTile
 import           XMonad.Layout.Spacing
@@ -72,8 +75,7 @@ instance SetsAmbiguous AllFloats where
 myManageHook :: ManageHook
 myManageHook = composeAll
     [ title =? "Media viewer" --> doFloat
-    , className =? "Xmessage" --> doFloat
-    , isFullscreen --> doFullFloat
+    , className =? "Xmessage" --> doFullFloat
     , manageDocks
     ]
 
@@ -111,12 +113,12 @@ myXPConfig = def { XP.font = "xft:Source Code Pro for Powerline:size=16"
 
 myTSConfig :: TS.TSConfig a
 myTSConfig = TS.tsDefaultConfig { TS.ts_font = "xft:Source Code Pro for Powerline:size=12"
-                                        , TS.ts_background = base2 - 0x3f000000
-                                        , TS.ts_highlight  = (base03, base00)
-                                        , TS.ts_node       = (base0, base2)
-                                        , TS.ts_nodealt    = (base0, base2)
-                                        , TS.ts_extra      = base02
-                                        }
+                                , TS.ts_background = base2 - 0x3f000000
+                                , TS.ts_highlight  = (base03, base00)
+                                , TS.ts_node       = (base0, base2)
+                                , TS.ts_nodealt    = (base0, base2)
+                                , TS.ts_extra      = base02
+                                }
 
 desktop :: IO [FilePath]
 desktop = do
@@ -192,7 +194,10 @@ myKeymap =
       , spawn "maim -u -s | tee /tmp/img.png | xclip -target image/png -sel clipboard"
       )
     , ( "M-f"
-      , withFocused (flip tileWindow $ Rectangle 0 0 1920 1080)
+      , (sendMessage $ Toggle NBFULL) >> sendMessage ToggleStruts >> toggleSmartSpacing
+      )
+    , ( "M-m"
+      , sendMessage $ Toggle MIRROR
       )
     , ("M-S-t", myTreeSelect)
     , ("M-p", XP.shellPrompt myXPConfig)
@@ -204,6 +209,8 @@ myKeymap =
     , ("<XF86AudioMute>", spawn "amixer set Master toggle")
     , ("<XF86MonBrightnessUp>", spawn "bright Up")
     , ("<XF86MonBrightnessDown>", spawn "bright Down")
+    , ("M--", incScreenWindowSpacing 2)
+    , ("M-=", decScreenWindowSpacing 2)
     ]
 
 myXmobar :: Handle -> X ()
@@ -217,7 +224,7 @@ myXmobar xmproc = dynamicLogWithPP xmobarPP
                      ) ++
                     )
                   . shorten 50
-    , ppLayout  = xmobarColor (colorToStr base02) (colorToStr base00) . wrap " " ""
+    , ppLayout  = const ""
     , ppHidden  = xmobarColor (colorToStr base1) (colorToStr base00)
                       . (\s -> xmobarAction ("xdotool key super+" ++ s) "1" s)
     , ppCurrent = xmobarColor (colorToStr base02) (colorToStr base00)
@@ -229,10 +236,11 @@ myLayoutHook =
         $   lessBorders OnlyScreenFloat
         $   avoidStruts
         $   spacingRaw False (Border 1 5 5 5) True (Border 3 3 3 3) True
-        $   tall ||| Mirror tall ||| Full ||| spiral (6 / 7)
+        $   mkToggle (MIRROR ?? NBFULL ?? EOT)
+        $   tall ||| spiral (6 / 7)
     where tall = Tall 1 (3/100) (1/2)
 
-myConfig xmproc = ewmh $ docks $ def
+myConfig xmproc = docks $ ewmh $ def
     { modMask            = mod4Mask
     , terminal           = terminalEmulator
     , layoutHook         = myLayoutHook
@@ -245,5 +253,8 @@ myConfig xmproc = ewmh $ docks $ def
 main :: IO ()
 main = do
     installSignalHandlers
+    spawn "(ps -e | grep pasystray) || pasystray"
+    spawn "(ps -e | grep nm-applet) || nm-applet"
+    spawn "(ps -e | grep blueman-tray) || blueman-tray"
     xmproc <- spawnPipe "xmobar $HOME/.xmonad/xmobarrc"
     xmonad $ myConfig xmproc
