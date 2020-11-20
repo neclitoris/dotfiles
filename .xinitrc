@@ -11,7 +11,8 @@ xsetroot -cursor_name left_ptr
 [[ -f ~/.Xresources ]] && xrdb -merge -I$HOME ~/.Xresources
 
 picom --experimental-backends &
-feh --bg-max ~/image/Wallpapers/rope\ giant.png &
+# feh --bg-max ~/image/Wallpapers/rope\ giant.png &
+nitrogen --restore &
 
 eval $(gnome-keyring-daemon --start --components=pkcs11,secrets,ssh)
 export SSH_AUTH_SOCK
