@@ -176,6 +176,7 @@ set shiftwidth=4
 set softtabstop=4
 set expandtab
 set noshiftround
+set fillchars+=eob:\ 
 
 " Cyrrilic in normal mode
 " set keymap=russian-jcukenwin
@@ -339,7 +340,7 @@ function ExpandAbbrev(close)
 endfunction
 
 augroup vimrc
-    autocmd BufRead,BufWritePre,FileWritePre * silent! %s/[\r \t]\+$//
+    autocmd BufRead,BufWritePre,FileWritePre * silent! %s/\(\\\@<!\s\)\+$//
 augroup END
 
 set noswapfile
