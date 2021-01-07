@@ -15,6 +15,7 @@ import qualified System.Process                as P
 import           System.IO
 
 import           XMonad
+import qualified XMonad.Actions.FlexibleResize as Flex
 import qualified XMonad.Actions.TreeSelect     as TS
 import           XMonad.Config.Gnome
 import           XMonad.Hooks.DynamicLog
@@ -80,7 +81,7 @@ myManageHook = composeAll
     ]
 
 screenLocker :: String
-screenLocker = "slock"
+screenLocker = "lock"
 
 getTmuxSessions :: IO [String]
 getTmuxSessions = do
@@ -100,7 +101,7 @@ getTmuxSessions = do
                     ""
 
 myXPConfig :: XP.XPConfig
-myXPConfig = def { XP.font = "xft:Source Code Pro for Powerline:size=16"
+myXPConfig = def { XP.font = "xft:Source Code Pro for Powerline:pixelsize=16:antialiase=true"
                  , XP.bgColor = colorToStr base2
                  , XP.fgColor = colorToStr base0
                  , XP.bgHLight = colorToStr base00
@@ -112,7 +113,7 @@ myXPConfig = def { XP.font = "xft:Source Code Pro for Powerline:size=16"
                  }
 
 myTSConfig :: TS.TSConfig a
-myTSConfig = TS.tsDefaultConfig { TS.ts_font = "xft:Source Code Pro for Powerline:size=12"
+myTSConfig = TS.tsDefaultConfig { TS.ts_font = "xft:Source Code Pro for Powerline:pixelsize=16:antialiase=true"
                                 , TS.ts_background = base2 - 0x3f000000
                                 , TS.ts_highlight  = (base03, base00)
                                 , TS.ts_node       = (base0, base2)
@@ -127,10 +128,26 @@ desktop = do
     let desk = comps </> "desktop"
     L.sort . fmap (desk </>) . filter ((== ".desktop") . takeExtension) <$> listDirectory desk
 
-data TmuxRenamePrompt = TmuxRenamePrompt deriving (Read, Show)
+data NoPrompt = NoPrompt
 
-instance XP.XPrompt TmuxRenamePrompt where
-    showXPrompt _ = "Enter new name: "
+instance XP.XPrompt NoPrompt where
+  showXPrompt _ = ""
+
+data OverridePrompt p
+  = OverridePrompt
+    { oPrompt :: p
+    , oLine :: String }
+
+instance XP.XPrompt p => XP.XPrompt (OverridePrompt p) where
+  showXPrompt = oLine
+  nextCompletion = nextCompletion . oPrompt
+  commandToComplete = commandToComplete . oPrompt
+  completionToCommand = completionToCommand . oPrompt
+  completionFunction = completionFunction . oPrompt
+  modeAction = modeAction . oPrompt
+
+namedShellPrompt = OverridePrompt XP.Shell
+namedPrompt = OverridePrompt NoPrompt
 
 myTreeSelect :: X ()
 myTreeSelect = do
@@ -172,12 +189,19 @@ myTreeSelect = do
         ]
     attachSession s = runInTerm "" (printf "tmux attach-session -t %s" s)
     killSession s = spawn (printf "tmux kill-session -t %s" s)
-    renameSession s = XP.mkXPrompt TmuxRenamePrompt myXPConfig (XP.mkComplFunFromList []) (spawn . printf "tmux rename-session -t %s %s" s)
+    renameSession s = XP.mkXPrompt (namedPrompt "Enter new name:") myXPConfig (XP.mkComplFunFromList []) (spawn . printf "tmux rename-session -t %s %s" s)
+
+runInTerminal :: XP.XPConfig -> X ()
+runInTerminal c = do
+  cmds <- io getCommands
+  mkXPrompt (namedShellPrompt "Run in terminal: ") c (getShellCompl cmds $ searchPredicate c) (spawn . printf "%s -e %s" terminalEmulator)
 
 myKeymap :: [(String, X ())]
 myKeymap =
-    [ ("M-h", sendMessage Shrink)
-    , ("M-l", sendMessage Expand)
+    [ ("M-<Left>", sendMessage Shrink)
+    , ("M-<Right>", sendMessage Expand)
+    , ("M-<Down>", sendMessage MirrorShrink)
+    , ("M-<Up>", sendMessage MirrorExpand)
     , ("C-M1-l"    , spawn screenLocker)
     , ("<Print>"   , spawn "maim -u $(date +\"$HOME/image/Screenshots/%FT%T.png\")")
     , ("M1-<Print>", spawn "maim -u -i $(xdotool getactivewindow) $(date +\"$HOME/image/Screenshots/%FT%T.png\")")
@@ -194,24 +218,27 @@ myKeymap =
       , spawn "maim -u -s | tee /tmp/img.png | xclip -target image/png -sel clipboard"
       )
     , ( "M-f"
-      , (sendMessage $ Toggle NBFULL) >> sendMessage ToggleStruts >> toggleSmartSpacing
+      , sendMessage (Toggle NBFULL) >> sendMessage ToggleStruts >> toggleSmartSpacing
       )
     , ( "M-m"
       , sendMessage $ Toggle MIRROR
       )
     , ("M-S-t", myTreeSelect)
     , ("M-p", XP.shellPrompt myXPConfig)
+    , ("M-S-p", runInTerminal myXPConfig)
     , ("M-S-x", XP.xmonadPrompt myXPConfig)
     , ("C-M1-h", withFocused hideWindow)
     , ("C-M1-p", popOldestHiddenWindow)
-    , ("<XF86AudioRaiseVolume>" , spawn "amixer set Master 3%+")
-    , ("<XF86AudioLowerVolume>" , spawn "amixer set Master 3%-")
+    , ("<XF86AudioRaiseVolume>" , spawn "amixer set Master 2%+")
+    , ("<XF86AudioLowerVolume>" , spawn "amixer set Master 2%-")
     , ("<XF86AudioMute>", spawn "amixer set Master toggle")
-    , ("<XF86MonBrightnessUp>", spawn "bright Up")
-    , ("<XF86MonBrightnessDown>", spawn "bright Down")
+    , ("<XF86MonBrightnessUp>", spawn "backlight_control +10")
+    , ("<XF86MonBrightnessDown>", spawn "backlight_control -10")
     , ("M--", incScreenWindowSpacing 2)
     , ("M-=", decScreenWindowSpacing 2)
     ]
+
+myMouse = [((mod4Mask, button3), \w -> focus w >> Flex.mouseResizeWindow w)]
 
 myXmobar :: Handle -> X ()
 myXmobar xmproc = dynamicLogWithPP xmobarPP
@@ -238,7 +265,7 @@ myLayoutHook =
         $   spacingRaw False (Border 1 5 5 5) True (Border 3 3 3 3) True
         $   mkToggle (MIRROR ?? NBFULL ?? EOT)
         $   tall ||| spiral (6 / 7)
-    where tall = Tall 1 (3/100) (1/2)
+    where tall = ResizableTall 1 (3/100) (1/2) []
 
 myConfig xmproc = docks $ ewmh $ def
     { modMask            = mod4Mask
@@ -249,11 +276,12 @@ myConfig xmproc = docks $ ewmh $ def
     , normalBorderColor  = colorToStr base2
     , focusedBorderColor = colorToStr base2
     } `additionalKeysP` myKeymap
+      `additionalMouseBindings` myMouse
 
 main :: IO ()
 main = do
     installSignalHandlers
-    spawn "(ps -e | grep pasystray) || pasystray"
+    spawn "(ps -e | grep pasystray) || pasystray -a"
     spawn "(ps -e | grep nm-applet) || nm-applet"
     spawn "(ps -e | grep blueman-tray) || blueman-tray"
     xmproc <- spawnPipe "xmobar $HOME/.xmonad/xmobarrc"

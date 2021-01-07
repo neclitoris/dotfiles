@@ -44,6 +44,8 @@ syntax on
 " For plugins to load correctly
 filetype plugin indent on
 
+let g:python3_host_prog = "/usr/bin/python"
+
 " Startify
 let g:startify_bookmarks = [
     \ { 'c': '~/.config/nvim/init.vim' },
@@ -66,7 +68,7 @@ let g:ycm_extra_conf_globlist = ["~/doc/programming/*"]
 let g:airline_powerline_fonts = 1
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#keymap#enabled = 0
-let g:airline#extensions#xkblayout#enabled = 0
+let g:airline#extensions#xkblayout#enabled = 1
 let g:airline#extensions#tmuxline#enabled = 0
 
 " DelimitMate
@@ -128,8 +130,8 @@ let g:ycm_semantic_triggers.haskell = ['.']
 " let g:necoghc_enable_detailed_browse = 0
 let g:ycm_language_server += [{
             \   'name': 'haskell',
-            \   'cmdline': ['hie-wrapper', '--lsp'],
-            \   'filetypes': ['hs', 'haskell', 'lhs'],
+            \   'cmdline': ['haskell-language-server-wrapper', '--lsp'],
+            \   'filetypes': ['hs', 'haskell', 'lhs', 'lhaskell'],
             \   'project_root_files': ['stack.yaml', 'cabal.project', 'package.yaml']
             \}]
 
