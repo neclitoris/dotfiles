@@ -75,8 +75,8 @@ instance SetsAmbiguous AllFloats where
 
 myManageHook :: ManageHook
 myManageHook = composeAll
-    [ title =? "Media viewer" --> doFloat
-    , className =? "Xmessage" --> doFullFloat
+    [ title =? "Media viewer" --> doFullFloat
+    , className =? "Xmessage" --> doFloat
     , manageDocks
     ]
 
@@ -171,8 +171,8 @@ myTreeSelect = do
         [ ("firefox" , "firefox")
         , ("telegram", "telegram-desktop")
         , ("discord" , "discord")
-        , ("steam"   , "steam")
-        , ("gimp"    , "gimp")
+        , ("steam"   , "prime-run steam")
+        , ("gimp"    , "prime-run gimp")
         ]
     -- power tab
     powerComs =
@@ -232,8 +232,8 @@ myKeymap =
     , ("<XF86AudioRaiseVolume>" , spawn "amixer set Master 2%+")
     , ("<XF86AudioLowerVolume>" , spawn "amixer set Master 2%-")
     , ("<XF86AudioMute>", spawn "amixer set Master toggle")
-    , ("<XF86MonBrightnessUp>", spawn "backlight_control +10")
-    , ("<XF86MonBrightnessDown>", spawn "backlight_control -10")
+    , ("<XF86MonBrightnessUp>", spawn "backlight update +10; notify-send -h string:x-canonical-private-synchronous:anything -t 500 'Current brightness' \"$(backlight query)%\"")
+    , ("<XF86MonBrightnessDown>", spawn "backlight update -10; notify-send -h string:x-canonical-private-synchronous:anything -t 500 'Current brightness' \"$(backlight query)%\"")
     , ("M--", incScreenWindowSpacing 2)
     , ("M-=", decScreenWindowSpacing 2)
     ]

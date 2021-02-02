@@ -10,13 +10,16 @@ ZSH="$UTIL/oh-my-zsh"
 
 ZSH_THEME="agnoster"
 DEFAULT_USER="neclitoris"
+VI_MODE_SET_CURSOR=true
+MODE_INDICATOR="%F{yellow}+%f"
 
 plugins=(autoenv
     virtualenv
     git
     zsh-autosuggestions
     zsh-syntax-highlighting
-    zsh-dircolors-solarized)
+    zsh-dircolors-solarized
+    vi-mode)
 
 source $ZSH/oh-my-zsh.sh
 unalias gm
