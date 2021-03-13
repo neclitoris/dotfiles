@@ -12,7 +12,7 @@ call vundle#begin()
 Plugin 'VundleVim/Vundle.vim'
 " Plugin 'Raimondi/delimitMate.git'
 Plugin 'google/glaive'
-Plugin 'Yggdroot/indentLine.git'
+" Plugin 'Yggdroot/indentLine.git'
 Plugin 'scrooloose/nerdcommenter.git'
 Plugin 'scrooloose/nerdtree.git'
 Plugin 'vim-airline/vim-airline.git'
@@ -35,6 +35,7 @@ Plugin 'lyokha/vim-xkbswitch'
 Plugin 'elzr/vim-json'
 Plugin 'neovimhaskell/haskell-vim'
 Plugin 'tpope/vim-obsession'
+" Plugin 'enomsg/vim-haskellConcealPlus'
 
 call vundle#end()
 
@@ -90,6 +91,7 @@ let g:indentLine_first_char = '│'
 let g:indentLine_showFirstIndentLevel = 1
 let g:indentLine_fileTypeExclude = ['startify']
 let g:indentLine_setConceal = 0
+set concealcursor=nc
 
 " vim-tmux-navigator
 let g:tmux_navigator_no_mappings = 1
@@ -190,7 +192,6 @@ set scrolloff=0
 set backspace=indent,eol,start
 set mouse=a
 set conceallevel=1
-set concealcursor="nc"
 
 " Cursor style
 " au VimEnter,InsertLeave * silent execute '!echo -ne "\e[4 q"' | redraw!
@@ -262,6 +263,8 @@ nnoremap <leader>lg :YcmCompleter GoTo<CR>
 vnoremap <leader>lg :YcmCompleter GoTo<CR>
 nnoremap <leader>lf :YcmCompleter Format<CR>
 vnoremap <leader>lf :YcmCompleter Format<CR>
+nnoremap <leader>ld :YcmCompleter GetHover<CR>
+vnoremap <leader>ld :YcmCompleter GetHover<CR>
 
 " TODO: figure out how to create "argument" textblock
 function InnerArgument()

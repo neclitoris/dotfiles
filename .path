@@ -1,11 +1,10 @@
 PATH="$UTIL/texlive/bin/x86_64-linux:$PATH"
 PATH="/usr/local/cuda-10.1/bin:$PATH"
-PATH="$HOME/.cabal/bin:$PATH"
-PATH="$HOME/.ghcup/bin:$PATH"
 PATH="$HOME/.bin:$PATH"
 PATH="$HOME/.local/bin:$PATH"
 LD_LIBRARY_PATH="/usr/local/cuda-10.1/lib64:$LD_LIBRARY_PATH"
 LD_LIBRARY_PATH="/usr/local/cuda/extras/CUPTI/lib64/:$LD_LIBRARY_PATH"
 MANPATH="/home/neclitoris/util/texlive/texmf-dist/doc/man:$MANPATH"
 INFOPATH="/home/neclitoris/util/texlive/texmf-dist/doc/info:$INFOPATH"
+[ -f "/home/neclitoris/.ghcup/env" ] && source "/home/neclitoris/.ghcup/env" # ghcup-env
 

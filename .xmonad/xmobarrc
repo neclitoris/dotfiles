@@ -21,16 +21,19 @@
 
 -- 
 
-Config { font = "xft:Source Code Pro for Powerline:pixelsize=16:antialiase=true:Regular,FontAwesome:pixelsize=16"
+Config { font = "xft:Source Code Pro for Powerline:pixelsize=16:antialiase=true:Regular\
+                    \,FontAwesome:pixelsize=16"
         , additionalFonts = ["xft:Source Code Pro for Powerline:pixelsize=18:antialiase=true:Regular"]
-        , position = Static { xpos = 0 , ypos = 0, width = 1800, height = 22 }
+        , position = Static { xpos = 8, ypos = 8, width = 1904, height = 22 }
         , bgColor = "#073642"
         , fgColor = "#657b83"
         , alpha = 255
         , textOffset = 16
         , textOffsets = [17]
-        , commands = [ Run Cpu ["-t", "CPU: <total>%", "-L","3","-H","50"] 10
-                     , Run Memory ["-t","RAM: <usedratio>%"] 10
+        , commands = [ Run Com "cpu-load" [] "cpu" 10
+                     , Run Com "mem-load" [] "memory" 10
+                     , Run Com "bat-status" [] "battery" 10
+                     , Run Com "updates" [] "updates" 36000
                      , Run Swap [] 10
                      , Run Date "%a %F %H:%M:%S" "date" 10
                      , Run UnsafeStdinReader
@@ -48,29 +51,41 @@ Config { font = "xft:Source Code Pro for Powerline:pixelsize=16:antialiase=true:
 --                           , "--highs", "\xf028 "
 --                           ]
 --                           5
-                     , Run BatteryP
-                           ["BAT0"]
-                           ["-t", "<acstatus>"
-                           , "-L", "25", "-H", "75"
-                           , "--"
-                           , "-O", "\xf1e6 <left>% / <timeleft>"
-                           , "-i", "\xf1e6 100% / <timeleft>"
-                           , "-o", "<left>% / <timeleft>"
-                           , "--lows", "\xf243 "
-                           , "--mediums", "\xf242 "
-                           , "--highs", "\xf240 "
-                           , "-a", "notify-send -u critical 'Battery running out'"
-                           , "-A", "10"
-                           ]
-                           5
+--                     , Run BatteryP
+--                           ["BAT0"]
+--                           ["-t", "<acstatus>"
+--                           , "-L", "25", "-H", "75"
+--                           , "--"
+--                           , "-O", "\xf1e6 <left>% / <timeleft>"
+--                           , "-i", "\xf1e6 100% / <timeleft>"
+--                           , "-o", "<left>% / <timeleft>"
+--                           , "--lows", "\xf243 "
+--                           , "--mediums", "\xf242 "
+--                           , "--highs", "\xf240 "
+--                           , "-a", "notify-send -u critical 'Battery running out'"
+--                           , "-A", "10"
+--                           ]
+--                           5
 --                     , Run Wireless
 --                           ""
 --                           ["-t", "<qualityipat>"
 --                           , "--", "--quality-icon-pattern", "\xf1eb <quality>%"]
 --                           10
+                       , Run Com "xmobar-stalonetray-pad" [] "traypad" 10
                      ]
         , sepChar = "%"
         , alignSep = "}{"
         , iconRoot = "/home/neclitoris/image/icons/"
-        , template = "<fc=#eee8d5,#839496> </fc>%UnsafeStdinReader% }{ <fn=1><fc=#657b83></fc></fn><fc=#dc322f,#657b83> %kbd% </fc><fn=1><fc=#839496,#657b83></fc></fn><fc=#eee8d5,#839496><fn=1></fn> %cpu% <fn=1></fn> %memory% <fn=1></fn> %date% <fn=1></fn> %battery% <fn=1></fn></fc>"
+        , template = "<fc=#eee8d5,#839496> </fc>%UnsafeStdinReader% }{ \
+            \<fn=1></fn> %cpu% \
+            \<fn=1></fn> %memory% \
+            \<fn=1></fn> %battery% \
+            \<fn=1><fc=#657b83></fc></fn>\
+            \<fc=#dc322f,#657b83> %kbd% </fc>\
+            \<fn=1><fc=#839496,#657b83></fc></fn>\
+            \<fc=#eee8d5,#839496>\
+            \<fn=1></fn> %date% \
+            \<fn=1></fn> <action=`alacritty -e zsh -c 'checkupdates | vim -R'` button=1>%updates%</action> \
+            \<fn=1></fn>%traypad% \
+            \</fc>"
         }

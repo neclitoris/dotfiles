@@ -1,7 +1,7 @@
 #!/usr/bin/zsh
 
-# xrandr --setprovideroutputsource modesetting NVIDIA-0
-# xrandr --auto
+xrandr --setprovideroutputsource modesetting NVIDIA-0
+xrandr --auto
 xset dpms 0 0 0
 
 setxkbmap us,ru -option 'grp:lalt_lshift_toggle'
@@ -19,4 +19,5 @@ killall notification-manager
 dunst &
 stalonetray &
 
+eval $(ssh-agent -s)
 exec dbus-launch --exit-with-session xmonad
