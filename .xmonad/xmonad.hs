@@ -1,14 +1,18 @@
-{-# LANGUAGE TypeSynonymInstances, DeriveDataTypeable, FunctionalDependencies #-}
+{-# LANGUAGE TypeSynonymInstances, DeriveDataTypeable, FunctionalDependencies, ScopedTypeVariables #-}
 import           Control.Exception
 import           Control.Monad
+import           Data.Char
 import           Data.Default
 import qualified Data.List                     as L
 import qualified Data.Map                      as M
+import           Data.Monoid
 import           Data.Tree
 import           Data.Word
+import qualified Language.Haskell.Interpreter  as I
 import           Numeric
 import           Text.Printf
 import           System.Directory
+import           System.Environment
 import           System.Exit
 import           System.FilePath.Posix
 import qualified System.Process                as P
@@ -16,10 +20,12 @@ import           System.IO
 
 import           XMonad
 import qualified XMonad.Actions.FlexibleResize as Flex
+import           XMonad.Actions.Navigation2D   as Nav
 import qualified XMonad.Actions.TreeSelect     as TS
 import           XMonad.Config.Gnome
 import           XMonad.Hooks.DynamicLog
 import           XMonad.Hooks.EwmhDesktops
+import           XMonad.Hooks.InsertPosition
 import           XMonad.Hooks.ManageDocks
 import           XMonad.Hooks.ManageHelpers
 import           XMonad.Layout.MultiToggle
@@ -35,6 +41,8 @@ import           XMonad.Prompt.XMonad          as XP
 import qualified XMonad.StackSet               as W
 import           XMonad.Util.EZConfig
 import           XMonad.Util.Run
+
+import           Eval
 
 -- Solarized colorscheme
 
@@ -68,17 +76,27 @@ colorToStr = ('#' :) . drop 2 . (`showHex` "")
 terminalEmulator :: String
 terminalEmulator = "alacritty"
 
-data AllFloats = AllFloats deriving (Read, Show)
-
-instance SetsAmbiguous AllFloats where
-    hiddens _ wset _ _ _ = M.keys $ W.floating wset
+shouldFloat :: Query Bool
+shouldFloat =
+  foldMap (Endo . (<||>) . isInProperty "_NET_WM_WINDOW_TYPE")
+    [ "_NET_WM_WINDOW_TYPE_UTILITY"
+    , "_NET_WM_WINDOW_TYPE_NOTIFICATION"
+    , "_NET_WM_WINDOW_TYPE_TOOLBAR"
+    , "_NET_WM_WINDOW_TYPE_SPLASH"
+    , "_NET_WM_WINDOW_TYPE_DIALOG"
+    , "_NET_WM_WINDOW_TYPE_FILE_PROGRESS"
+    , "_NET_WM_WINDOW_TYPE_CONFIRM"
+    , "_NET_WM_WINDOW_TYPE_DOWNLOAD"
+    , "_NET_WM_WINDOW_TYPE_ERROR"
+    ] `appEndo` return False
 
 myManageHook :: ManageHook
-myManageHook = composeAll
-    [ title =? "Media viewer" --> doFullFloat
-    , className =? "Xmessage" --> doFloat
-    , manageDocks
-    ]
+myManageHook = composeOne
+    [ title =? "Media viewer" -?> doFullFloat
+    , className =? "alacritty-t-bg" -?> doIgnore
+    , className =? "Xmessage" -?> doCenterFloat
+    , shouldFloat -?> doCenterFloat
+    ] <+> manageDocks
 
 screenLocker :: String
 screenLocker = "lock"
@@ -101,15 +119,16 @@ getTmuxSessions = do
                     ""
 
 myXPConfig :: XP.XPConfig
-myXPConfig = def { XP.font = "xft:Source Code Pro for Powerline:pixelsize=16:antialiase=true"
+myXPConfig = def { XP.font = "xft:Source Code Pro for Powerline:pixelsize=24:antialiase=true"
                  , XP.bgColor = colorToStr base2
                  , XP.fgColor = colorToStr base0
                  , XP.bgHLight = colorToStr base00
                  , XP.fgHLight = colorToStr base03
                  , XP.borderColor = colorToStr base2
-                 , XP.position = Top
-                 , XP.height = 22
+                 , XP.position = XP.CenteredAt { XP.xpCenterY = 0.2, XP.xpWidth = 0.5 }
+                 , XP.height = 40
                  , XP.maxComplRows = Just 1
+                 , XP.autoComplete = Nothing
                  }
 
 myTSConfig :: TS.TSConfig a
@@ -148,6 +167,21 @@ instance XP.XPrompt p => XP.XPrompt (OverridePrompt p) where
 
 namedShellPrompt = OverridePrompt XP.Shell
 namedPrompt = OverridePrompt NoPrompt
+
+data EvalPrompt = EvalPrompt
+
+instance XP.XPrompt EvalPrompt where
+  showXPrompt EvalPrompt = "haskell> "
+  commandToComplete _ = id
+  completionFunction EvalPrompt s = io $ do
+    res <- I.runInterpreter $ do
+            I.setImports ["Prelude", "Data.Ratio"]
+            res <- I.eval s
+            typ <- I.typeOf s
+            return $ res <> " :: " <> typ
+    case res of
+      Left err -> return [show err]
+      Right s -> return [s]
 
 myTreeSelect :: X ()
 myTreeSelect = do
@@ -189,7 +223,7 @@ myTreeSelect = do
         ]
     attachSession s = runInTerm "" (printf "tmux attach-session -t %s" s)
     killSession s = spawn (printf "tmux kill-session -t %s" s)
-    renameSession s = XP.mkXPrompt (namedPrompt "Enter new name:") myXPConfig (XP.mkComplFunFromList []) (spawn . printf "tmux rename-session -t %s %s" s)
+    renameSession s = XP.mkXPrompt (namedPrompt "Enter new name: ") myXPConfig (XP.mkComplFunFromList []) (spawn . printf "tmux rename-session -t %s %s" s)
 
 runInTerminal :: XP.XPConfig -> X ()
 runInTerminal c = do
@@ -232,10 +266,11 @@ myKeymap =
     , ("<XF86AudioRaiseVolume>" , spawn "amixer set Master 2%+")
     , ("<XF86AudioLowerVolume>" , spawn "amixer set Master 2%-")
     , ("<XF86AudioMute>", spawn "amixer set Master toggle")
-    , ("<XF86MonBrightnessUp>", spawn "backlight update +10; notify-send -h string:x-canonical-private-synchronous:anything -t 500 'Current brightness' \"$(backlight query)%\"")
-    , ("<XF86MonBrightnessDown>", spawn "backlight update -10; notify-send -h string:x-canonical-private-synchronous:anything -t 500 'Current brightness' \"$(backlight query)%\"")
+    , ("<XF86MonBrightnessUp>", spawn "backlight update +5; notify-send -h string:x-canonical-private-synchronous:anything -t 500 'Current brightness' \"$(backlight query)%\"")
+    , ("<XF86MonBrightnessDown>", spawn "backlight update -5; notify-send -h string:x-canonical-private-synchronous:anything -t 500 'Current brightness' \"$(backlight query)%\"")
     , ("M--", incScreenWindowSpacing 2)
     , ("M-=", decScreenWindowSpacing 2)
+    , ("M-e", uninstallSignalHandlers >> mkXPromptWithModes [XPT EvalPrompt] myXPConfig >> installSignalHandlers)
     ]
 
 myMouse = [((mod4Mask, button3), \w -> focus w >> Flex.mouseResizeWindow w)]
@@ -243,14 +278,14 @@ myMouse = [((mod4Mask, button3), \w -> focus w >> Flex.mouseResizeWindow w)]
 myXmobar :: Handle -> X ()
 myXmobar xmproc = dynamicLogWithPP xmobarPP
     { ppOutput  = hPutStrLn xmproc . xmobarColor "" (colorToStr base00)
-    , ppTitle   = xmobarColor (colorToStr base0) ""
+    , ppTitle   = xmobarColor (colorToStr base0) (colorToStr base2)
                   . ((  "<fn=1>"
                      ++ xmobarColor (colorToStr base00) (colorToStr base0) "\xe0b0"
-                     ++ xmobarColor (colorToStr base0) "" "\xe0b0"
+                     ++ xmobarColor (colorToStr base0) (colorToStr base2) "\xe0b0"
                      ++ "</fn> "
                      ) ++
                     )
-                  . shorten 50
+                  . shorten 70
     , ppLayout  = const ""
     , ppHidden  = xmobarColor (colorToStr base1) (colorToStr base00)
                       . (\s -> xmobarAction ("xdotool key super+" ++ s) "1" s)
@@ -260,29 +295,33 @@ myXmobar xmproc = dynamicLogWithPP xmobarPP
 
 myLayoutHook =
     hiddenWindows
-        $   lessBorders OnlyScreenFloat
         $   avoidStruts
         $   spacingRaw False (Border 1 5 5 5) True (Border 3 3 3 3) True
         $   mkToggle (MIRROR ?? NBFULL ?? EOT)
         $   tall ||| spiral (6 / 7)
     where tall = ResizableTall 1 (3/100) (1/2) []
 
-myConfig xmproc = docks $ ewmh $ def
-    { modMask            = mod4Mask
-    , terminal           = terminalEmulator
-    , layoutHook         = myLayoutHook
-    , logHook            = myXmobar xmproc
-    , manageHook         = myManageHook <+> def
-    , normalBorderColor  = colorToStr base2
-    , focusedBorderColor = colorToStr base2
-    } `additionalKeysP` myKeymap
-      `additionalMouseBindings` myMouse
-
-main :: IO ()
-main = do
-    installSignalHandlers
+myStartupHook = do
     spawn "(ps -e | grep pasystray) || pasystray -a"
     spawn "(ps -e | grep nm-applet) || nm-applet"
     spawn "(ps -e | grep blueman-tray) || blueman-tray"
+
+myConfig xmproc =
+  Nav.navigation2DP
+    def { Nav.defaultTiledNavigation = Nav.sideNavigation }
+    ("k", "h", "j", "l") [("M-", Nav.windowGo), ("M-S-", Nav.windowSwap)] False
+    $ docks $ ewmh $ def
+      { modMask            = mod4Mask
+      , terminal           = terminalEmulator
+      , startupHook        = myStartupHook
+      , layoutHook         = myLayoutHook
+      , logHook            = myXmobar xmproc
+      , manageHook         = myManageHook <+> def
+      , borderWidth        = 0
+      } `additionalKeysP` myKeymap
+        `additionalMouseBindings` myMouse
+
+main :: IO ()
+main = do
     xmproc <- spawnPipe "xmobar $HOME/.xmonad/xmobarrc"
     xmonad $ myConfig xmproc
