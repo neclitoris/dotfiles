@@ -173,7 +173,7 @@ data EvalPrompt = EvalPrompt
 instance XP.XPrompt EvalPrompt where
   showXPrompt EvalPrompt = "haskell> "
   commandToComplete _ = id
-  completionFunction EvalPrompt s = io $ do
+  completionFunction EvalPrompt s = do
     res <- I.runInterpreter $ do
             I.setImports ["Prelude", "Data.Ratio"]
             res <- I.eval s
@@ -236,7 +236,7 @@ myKeymap =
     , ("M-<Right>", sendMessage Expand)
     , ("M-<Down>", sendMessage MirrorShrink)
     , ("M-<Up>", sendMessage MirrorExpand)
-    , ("C-M1-l"    , spawn screenLocker)
+    , ("C-M-l"    , spawn screenLocker)
     , ("<Print>"   , spawn "maim -u $(date +\"$HOME/image/Screenshots/%FT%T.png\")")
     , ("M1-<Print>", spawn "maim -u -i $(xdotool getactivewindow) $(date +\"$HOME/image/Screenshots/%FT%T.png\")")
     , ( "S-<Print>"
@@ -261,8 +261,8 @@ myKeymap =
     , ("M-p", XP.shellPrompt myXPConfig)
     , ("M-S-p", runInTerminal myXPConfig)
     , ("M-S-x", XP.xmonadPrompt myXPConfig)
-    , ("C-M1-h", withFocused hideWindow)
-    , ("C-M1-p", popOldestHiddenWindow)
+    , ("C-M-h", withFocused hideWindow)
+    , ("C-M-p", popOldestHiddenWindow)
     , ("<XF86AudioRaiseVolume>" , spawn "amixer set Master 2%+")
     , ("<XF86AudioLowerVolume>" , spawn "amixer set Master 2%-")
     , ("<XF86AudioMute>", spawn "amixer set Master toggle")
