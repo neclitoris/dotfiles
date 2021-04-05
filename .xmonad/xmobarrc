@@ -86,7 +86,7 @@ Config { font = "xft:Source Code Pro for Powerline:pixelsize=16:antialiase=true:
             \<fc=#eee8d5,#839496>\
             \<fn=1></fn> %date% \
             \<fn=1></fn> \
-            \<action=`alacritty -e zsh -c 'checkupdates | vim -R'` button=1>\
+            \<action=`alacritty -e zsh -c 'checkupdates | vim -R -'` button=1>\
             \<action=`alacritty -e zsh -c 'yay -Syu'` button=3>\
                 \%updates%\
             \</action>\
