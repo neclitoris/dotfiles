@@ -19,5 +19,7 @@ killall notification-manager
 dunst &
 stalonetray &
 
+redshift &
+
 eval $(ssh-agent -s)
 exec dbus-launch --exit-with-session xmonad
