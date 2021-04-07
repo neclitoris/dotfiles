@@ -96,6 +96,7 @@ myManageHook = composeOne
     , className =? "alacritty-t-bg" -?> doIgnore
     , className =? "Xmessage" -?> doCenterFloat
     , shouldFloat -?> doCenterFloat
+    , isFullscreen -?> doFullFloat
     ] <+> manageDocks
 
 screenLocker :: String
@@ -237,20 +238,12 @@ myKeymap =
     , ("M-<Down>", sendMessage MirrorShrink)
     , ("M-<Up>", sendMessage MirrorExpand)
     , ("C-M-l"    , spawn screenLocker)
-    , ("<Print>"   , spawn "maim -u $(date +\"$HOME/image/Screenshots/%FT%T.png\")")
-    , ("M1-<Print>", spawn "maim -u -i $(xdotool getactivewindow) $(date +\"$HOME/image/Screenshots/%FT%T.png\")")
-    , ( "S-<Print>"
-      , spawn "maim -u -s $(date +\"$HOME/image/Screenshots/%FT%T.png\")"
-      )
-    , ( "C-<Print>"
-      , spawn "maim -u | tee /tmp/img.png | xclip -target image/png -sel clipboard"
-      )
-    , ( "C-M1-<Print>"
-      , spawn "maim -u -i $(xdotool getactivewindow) | tee /tmp/img.png | xclip -target image/png -sel clipboard"
-      )
-    , ( "C-S-<Print>"
-      , spawn "maim -u -s | tee /tmp/img.png | xclip -target image/png -sel clipboard"
-      )
+    , ("<Print>"   , spawn "screenshot.sh -m full")
+    , ("M1-<Print>", spawn "screenshot.sh -m window")
+    , ("S-<Print>" , spawn "screenshot.sh -m region")
+    , ("C-<Print>" , spawn "screenshot.sh -m full -c")
+    , ("C-M1-<Print>" , spawn "screenshot.sh -m window -c")
+    , ("C-S-<Print>" , spawn "screenshot.sh -m region -c")
     , ( "M-f"
       , sendMessage (Toggle NBFULL) >> sendMessage ToggleStruts >> toggleSmartSpacing
       )
