@@ -271,6 +271,7 @@ myKeymap =
     , ("M--", incScreenWindowSpacing 2)
     , ("M-=", decScreenWindowSpacing 2)
     , ("M-e", uninstallSignalHandlers >> mkXPromptWithModes [XPT EvalPrompt] myXPConfig >> installSignalHandlers)
+    , ("M-S-e", spawn $ terminalEmulator <> " -e ghci")
     ]
 
 myMouse = [((mod4Mask, button3), \w -> focus w >> Flex.mouseResizeWindow w)]
