@@ -95,6 +95,7 @@ myManageHook = composeOne
     [ title =? "Media viewer" -?> doFullFloat
     , className =? "alacritty-t-bg" -?> doIgnore
     , className =? "Xmessage" -?> doCenterFloat
+    , className =? "feh" -?> doCenterFloat
     , shouldFloat -?> doCenterFloat
     , isFullscreen -?> doFullFloat
     ] <+> manageDocks
