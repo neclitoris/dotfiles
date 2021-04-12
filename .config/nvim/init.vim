@@ -14,7 +14,8 @@ Plugin 'VundleVim/Vundle.vim'
 Plugin 'google/glaive'
 " Plugin 'Yggdroot/indentLine.git'
 Plugin 'scrooloose/nerdcommenter.git'
-Plugin 'scrooloose/nerdtree.git'
+" Plugin 'scrooloose/nerdtree.git'
+Plugin 'tpope/vim-vinegar'
 Plugin 'vim-airline/vim-airline.git'
 Plugin 'vim-airline/vim-airline-themes.git'
 Plugin 'edkolev/tmuxline.vim'
@@ -30,17 +31,15 @@ Plugin 'tpope/vim-repeat'
 Plugin 'christoomey/vim-tmux-navigator'
 Plugin 'derekwyatt/vim-fswitch'
 " Plugin 'chrisbra/matchit'
-Plugin 'altercation/vim-colors-solarized'
+Plugin 'overcache/NeoSolarized'
 Plugin 'lyokha/vim-xkbswitch'
 Plugin 'elzr/vim-json'
 Plugin 'neovimhaskell/haskell-vim'
 Plugin 'tpope/vim-obsession'
+Plugin 'junegunn/fzf'
 " Plugin 'enomsg/vim-haskellConcealPlus'
 
 call vundle#end()
-
-" Turn on syntax highlighting
-syntax on
 
 " For plugins to load correctly
 filetype plugin indent on
@@ -84,6 +83,9 @@ let g:NERDCustomDelimiters = {
     \ 'cpp': {'left': '//', 'leftAlt': '/**', 'rightAlt': '**/'}
 \ }
 let g:NERDCommentEmptyLines = 1
+
+" netrw/vinegar
+let g:netrw_list_hide = '\(^\|\s\s\)\zs\.\S\+'
 
 " IndentLine
 let g:indentLine_char = '│'
@@ -139,7 +141,11 @@ let g:ycm_language_server += [{
 
 let g:XkbSwitchEnabled = 1
 
-let g:solarized_termtrans = 1
+if exists('g:neovide') || has('gui_running')
+    let g:neosolarized_termtrans = 0
+else
+    let g:neosolarized_termtrans = 1
+endif
 
 let g:vim_json_syntax_conceal = 0
 
@@ -149,12 +155,18 @@ set belloff=all
 let mapleader = "'"
 let maplocalleader = "'"
 
+if exists('g:neovide')
+    let g:neovide_cursor_animation_length = 0.07
+    let g:neovide_transparency = 0.85
+    let g:neovide_no_idle = v:true
+endif
+
 " Colorscheme
-" syntax enable
-colorscheme solarized
-" highlight ExtraWhitespace cterm=bold ctermfg=236 ctermbg=233
-" match ExtraWhitespace /\s\+$/
-" autocmd BufEnter,WinEnter * match ExtraWhitespace /\s\+$/
+set termguicolors
+colorscheme NeoSolarized
+syntax enable
+
+" Trailing spaces
 set listchars=trail:·
 set list
 
@@ -349,3 +361,7 @@ augroup vimrc
 augroup END
 
 set noswapfile
+
+set guifont=Hasklig:h15
+set guioptions-=rL
+set guioptions+=k
