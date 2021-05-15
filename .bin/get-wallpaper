@@ -1,0 +1,3 @@
+#!/bin/bash
+
+sed -e "/^file/!d" -e "s/^file=\(.*\)$/\1/" .config/nitrogen/bg-saved.cfg
