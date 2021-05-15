@@ -162,6 +162,15 @@ if exists('g:neovide')
 endif
 
 " Colorscheme
+function! TweakSolarized() abort
+    highlight LineNr         ctermbg=NONE guibg=NONE
+    highlight CursorLineNr   ctermbg=NONE guibg=NONE
+endfunction
+
+augroup MyColors
+    autocmd!
+    autocmd ColorScheme NeoSolarized call TweakSolarized()
+augroup END
 set termguicolors
 colorscheme NeoSolarized
 syntax enable
