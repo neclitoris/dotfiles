@@ -30,9 +30,9 @@ Config { font = "xft:Source Code Pro for Powerline:pixelsize=16:antialiase=true:
         , alpha = 255
         , textOffset = 16
         , textOffsets = [17]
-        , commands = [ Run Com "cpu-load" [] "cpu" 10
-                     , Run Com "mem-load" [] "memory" 10
-                     , Run Com "bat-status" [] "battery" 10
+        , commands = [ Run Com "cpu-load.hs" [] "cpu" 10
+                     , Run Com "mem-load.hs" [] "memory" 10
+                     , Run Com "bat-status.hs" [] "battery" 10
                      , Run Com "updates" [] "updates" 36000
                      , Run Swap [] 10
                      , Run Date "%a %F %H:%M:%S" "date" 10

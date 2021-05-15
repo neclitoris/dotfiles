@@ -42,8 +42,6 @@ import qualified XMonad.StackSet               as W
 import           XMonad.Util.EZConfig
 import           XMonad.Util.Run
 
-import           Eval
-
 -- Solarized colorscheme
 
 -- Dark
@@ -247,6 +245,9 @@ myKeymap =
     , ( "M-f"
       , sendMessage (Toggle NBFULL) >> sendMessage ToggleStruts >> toggleSmartSpacing
       )
+    , ( "M-S-f"
+      , sendMessage (Toggle NBFULL)
+      )
     , ( "M-m"
       , sendMessage $ Toggle MIRROR
       )
@@ -259,8 +260,8 @@ myKeymap =
     , ("<XF86AudioRaiseVolume>" , spawn "amixer set Master 2%+")
     , ("<XF86AudioLowerVolume>" , spawn "amixer set Master 2%-")
     , ("<XF86AudioMute>", spawn "amixer set Master toggle")
-    , ("<XF86MonBrightnessUp>", spawn "notify-send -h string:x-canonical-private-synchronous:anything -t 500 'Current brightness' \"$(backlight update +5)%\"")
-    , ("<XF86MonBrightnessDown>", spawn "notify-send -h string:x-canonical-private-synchronous:anything -t 500 'Current brightness' \"$(backlight update -5)%\"")
+    , ("<XF86MonBrightnessUp>", spawn "notify-send -h string:x-canonical-private-synchronous:anything -t 500 'Current brightness' -h int:value:$(backlight.hs update +5)%")
+    , ("<XF86MonBrightnessDown>", spawn "notify-send -h string:x-canonical-private-synchronous:anything -t 500 'Current brightness' -h int:value:$(backlight.hs update -5)%")
     , ("M--", incScreenWindowSpacing 2)
     , ("M-=", decScreenWindowSpacing 2)
     , ("M-e", uninstallSignalHandlers >> mkXPromptWithModes [XPT EvalPrompt] myXPConfig >> installSignalHandlers)

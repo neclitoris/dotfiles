@@ -1,0 +1,4 @@
+#!/bin/zsh
+
+UPD=$(checkupdates | wc -l)
+echo "Updates pending: $UPD"
