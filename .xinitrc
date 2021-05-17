@@ -2,10 +2,12 @@
 
 xrandr --setprovideroutputsource modesetting NVIDIA-0
 xrandr --auto
+xrandr --dpi 144
 xset dpms 0 0 0
 
 setxkbmap us,ru -option 'grp:lalt_lshift_toggle'
-xinput set-prop 'DELL07FA:00 06CB:7E92 Touchpad' 'libinput Natural Scrolling Enabled' 1
+# xinput set-prop 'CUST0001:00 04F3:3147 Touchpad' 'libinput Natural Scrolling Enabled' 1
+# xinput set-prop 'CUST0001:00 04F3:3147 Touchpad' 'libinput Tapping Enabled' 1
 xsetroot -cursor_name left_ptr
 xhost +si:localuser:root
 
@@ -21,5 +23,5 @@ stalonetray &
 
 redshift &
 
-eval $(ssh-agent -s)
-exec dbus-launch --exit-with-session xmonad
+acpi_handler.sh&
+xmonad

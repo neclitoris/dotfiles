@@ -204,14 +204,14 @@ myTreeSelect = do
         [ ("firefox" , "firefox")
         , ("telegram", "telegram-desktop")
         , ("discord" , "discord")
-        , ("steam"   , "prime-run steam")
-        , ("gimp"    , "prime-run gimp")
+        , ("steam"   , "steam")
+        , ("gimp"    , "gimp")
         ]
     -- power tab
     powerComs =
-        [ ("shutdown"   , "loginctl poweroff")
-        , ("reboot"     , "loginctl reboot")
-        , ("suspend"    , printf "(%s&) && sleep 1 && loginctl suspend" screenLocker)
+        [ ("shutdown"   , "systemctl poweroff")
+        , ("reboot"     , "systemctl reboot")
+        , ("suspend"    , printf "(%s&) && sleep 1 && systemctl suspend" screenLocker)
         , ("lock screen", screenLocker)
         ]
     -- tmux tab
@@ -236,12 +236,12 @@ myKeymap =
     , ("M-<Down>", sendMessage MirrorShrink)
     , ("M-<Up>", sendMessage MirrorExpand)
     , ("C-M-l"    , spawn screenLocker)
-    , ("<Print>"   , spawn "screenshot.sh -m full")
-    , ("M1-<Print>", spawn "screenshot.sh -m window")
-    , ("S-<Print>" , spawn "screenshot.sh -m region")
-    , ("C-<Print>" , spawn "screenshot.sh -m full -c")
-    , ("C-M1-<Print>" , spawn "screenshot.sh -m window -c")
-    , ("C-S-<Print>" , spawn "screenshot.sh -m region -c")
+    , ("<XF86Calculator>"   , spawn "screenshot.sh -m full")
+    , ("M1-<XF86Calculator>", spawn "screenshot.sh -m window")
+    , ("S-<XF86Calculator>" , spawn "screenshot.sh -m region")
+    , ("C-<XF86Calculator>" , spawn "screenshot.sh -m full -c")
+    , ("C-M1-<XF86Calculator>" , spawn "screenshot.sh -m window -c")
+    , ("C-S-<XF86Calculator>" , spawn "screenshot.sh -m region -c")
     , ( "M-f"
       , sendMessage (Toggle NBFULL) >> sendMessage ToggleStruts >> toggleSmartSpacing
       )
@@ -257,11 +257,6 @@ myKeymap =
     , ("M-S-x", XP.xmonadPrompt myXPConfig)
     , ("C-M-h", withFocused hideWindow)
     , ("C-M-p", popOldestHiddenWindow)
-    , ("<XF86AudioRaiseVolume>" , spawn "amixer set Master 2%+")
-    , ("<XF86AudioLowerVolume>" , spawn "amixer set Master 2%-")
-    , ("<XF86AudioMute>", spawn "amixer set Master toggle")
-    , ("<XF86MonBrightnessUp>", spawn "notify-send -h string:x-canonical-private-synchronous:anything -t 500 'Current brightness' -h int:value:$(backlight.hs update +5)%")
-    , ("<XF86MonBrightnessDown>", spawn "notify-send -h string:x-canonical-private-synchronous:anything -t 500 'Current brightness' -h int:value:$(backlight.hs update -5)%")
     , ("M--", incScreenWindowSpacing 2)
     , ("M-=", decScreenWindowSpacing 2)
     , ("M-e", uninstallSignalHandlers >> mkXPromptWithModes [XPT EvalPrompt] myXPConfig >> installSignalHandlers)
@@ -299,7 +294,6 @@ myLayoutHook =
 myStartupHook = do
     spawn "(ps -e | grep pasystray) || pasystray -a"
     spawn "(ps -e | grep nm-applet) || nm-applet"
-    spawn "(ps -e | grep blueman-tray) || blueman-tray"
 
 myConfig xmproc =
   Nav.navigation2DP
