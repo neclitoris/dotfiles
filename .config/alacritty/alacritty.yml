@@ -1,7 +1,7 @@
 # Font configuration (changes require restart)
 font:
     # The size to use.
-    size: 11
+    size: 8
     # The normal (roman) font face to use.
     normal:
           # family: Source Code Pro for Powerline
