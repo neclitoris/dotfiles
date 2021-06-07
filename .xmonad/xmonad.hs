@@ -19,6 +19,7 @@ import qualified System.Process                as P
 import           System.IO
 
 import           XMonad
+import qualified XMonad.Actions.CopyWindow     as Copy
 import qualified XMonad.Actions.FlexibleResize as Flex
 import           XMonad.Actions.Navigation2D   as Nav
 import qualified XMonad.Actions.TreeSelect     as TS
@@ -256,11 +257,13 @@ myKeymap =
     , ("M-S-p", runInTerminal myXPConfig)
     , ("M-S-x", XP.xmonadPrompt myXPConfig)
     , ("C-M-h", withFocused hideWindow)
-    , ("C-M-p", popOldestHiddenWindow)
+    , ("C-M-S-h", popOldestHiddenWindow)
     , ("M--", incScreenWindowSpacing 2)
     , ("M-=", decScreenWindowSpacing 2)
     , ("M-e", uninstallSignalHandlers >> mkXPromptWithModes [XPT EvalPrompt] myXPConfig >> installSignalHandlers)
     , ("M-S-e", spawn $ terminalEmulator <> " -e ghci")
+    , ("C-M-p", windows Copy.copyToAll)
+    , ("C-M-S-p", Copy.killAllOtherCopies)
     ]
 
 myMouse = [((mod4Mask, button3), \w -> focus w >> Flex.mouseResizeWindow w)]
