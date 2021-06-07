@@ -24,6 +24,8 @@ plugins=(autoenv
 source $ZSH/oh-my-zsh.sh
 unalias gm
 
+compdef _git config=git
+
 # other things init
 # source "$UTIL/torch/install/bin/torch-activate"
 
@@ -35,3 +37,4 @@ source /usr/share/fzf/completion.zsh
 source /usr/share/fzf/key-bindings.zsh
 
 setopt nosharehistory
+setopt no_complete_aliases
