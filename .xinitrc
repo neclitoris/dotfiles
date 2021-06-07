@@ -1,5 +1,7 @@
 #!/usr/bin/zsh
 
+export GTK_THEME="Material-Black-Blueberry-Suru"
+
 xrandr --setprovideroutputsource modesetting NVIDIA-0
 xrandr --auto
 xrandr --dpi 144
@@ -21,6 +23,7 @@ killall notification-manager
 dunst &
 stalonetray &
 
+/usr/lib/geoclue-2.0/demos/agent &
 redshift &
 
 acpi_handler.sh&

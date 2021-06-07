@@ -1,16 +1,16 @@
 #!/bin/bash
 
 sel_icon() {
-    if (( BRIGHTNESS > 75 )); then
-        ICON="/usr/share/icons/Material-Black-Blueberry-Suru-GLOW/status/48/notification-display-brightness-full.svg"
-    elif (( BRIGHTNESS > 50 )); then
-        ICON="/usr/share/icons/Material-Black-Blueberry-Suru-GLOW/status/48/notification-display-brightness-high.svg"
-    elif (( BRIGHTNESS > 25 )); then
-        ICON="/usr/share/icons/Material-Black-Blueberry-Suru-GLOW/status/48/notification-display-brightness-medium.svg"
-    elif (( BRIGHTNESS > 0 )); then
-        ICON="/usr/share/icons/Material-Black-Blueberry-Suru-GLOW/status/48/notification-display-brightness-low.svg"
+    if (( $1 > 75 )); then
+        ICON="/usr/share/icons/Material-Black-Blueberry-Suru/status/48/notification-display-brightness-full.svg"
+    elif (( $1 > 50 )); then
+        ICON="/usr/share/icons/Material-Black-Blueberry-Suru/status/48/notification-display-brightness-high.svg"
+    elif (( $1 > 25 )); then
+        ICON="/usr/share/icons/Material-Black-Blueberry-Suru/status/48/notification-display-brightness-medium.svg"
+    elif (( $1 > 0 )); then
+        ICON="/usr/share/icons/Material-Black-Blueberry-Suru/status/48/notification-display-brightness-low.svg"
     else
-        ICON="/usr/share/icons/Material-Black-Blueberry-Suru-GLOW/status/48/notification-display-brightness-off.svg"
+        ICON="/usr/share/icons/Material-Black-Blueberry-Suru/status/48/notification-display-brightness-off.svg"
     fi
 }
 
@@ -36,18 +36,16 @@ handle() {
             pactl set-sink-mute @DEFAULT_SINK@ toggle
             ;;
         video/brightnessup)
-            BRIGHTNESS=$(backlight.hs update +5)
-            sel_icon
-            dunstify -i "$ICON" \
-                -h string:x-canonical-private-synchronous:brightness \
-                -t 500 'Current brightness' -h "int:value:$BRIGHTNESS"
+            sel_icon $(backlight.hs update +5)
+            dunstify -i "$ICON" -a "acpi_handler" \
+                -t 500 -h "int:value:$(backlight.hs query)" \
+                "Brightness"
             ;;
         video/brightnessdown)
-            BRIGHTNESS=$(backlight.hs update -5)
-            sel_icon
-            dunstify -i "$ICON" \
-                -h string:x-canonical-private-synchronous:brightness \
-                -t 500 'Current brightness' -h "int:value:$BRIGHTNESS"
+            sel_icon $(backlight.hs update -5)
+            dunstify -i "$ICON" -a "acpi_handler" \
+                -t 500 -h "int:value:$(backlight.hs query)" \
+                "Brightness"
             ;;
     esac
 }

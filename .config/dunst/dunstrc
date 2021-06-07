@@ -195,7 +195,7 @@
     max_icon_size = 24
 
     # Paths to default icons.
-    icon_path = /usr/share/icons/Material-Black-Blueberry-Suru-GLOW/status/48
+    icon_path = /usr/share/icons/Material-Black-Blueberry-Suru/status/48
 
     ### History ###
 
@@ -462,8 +462,9 @@
 #    summary = *twitter.com*
 #    urgency = normal
 #
-#[stack-volumes]
-#    appname = "some_volume_notifiers"
-#    set_stack_tag = "volume"
+[acpi_handler]
+    appname = "acpi_handler"
+    format  = "<b>%s</b>"
+    set_stack_tag = "acpi_handler"
 #
 # vim: ft=cfg
