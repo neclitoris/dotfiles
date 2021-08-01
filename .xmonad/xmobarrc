@@ -22,7 +22,10 @@
 -- 
 
 Config { font = "xft:Source Code Pro for Powerline:pixelsize=16:antialiase=true:Regular\
-                    \,FontAwesome:pixelsize=16"
+                    \,FontAwesome:pixelsize=16\
+                    \,Noto Sans CJK SC:pixelsize=16:antialiase=true
+                    \,Noto Sans CJK JP:pixelsize=16:antialiase=true
+                    \,Noto Sans CJK KR:pixelsize=16:antialiase=true"
         , additionalFonts = ["xft:Source Code Pro for Powerline:pixelsize=18:antialiase=true:Regular"]
         , position = Static { xpos = 8, ypos = 8, width = 1904, height = 22 }
         , bgColor = "#073642"
