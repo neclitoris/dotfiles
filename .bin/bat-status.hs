@@ -1,10 +1,18 @@
 #!/home/neclitoris/.bin/runghc-cached.sh
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE OverloadedStrings #-}
 
+import Control.Exception
 import Control.Monad
 import Data.Ratio
+import Data.Time
+import Data.Time.Clock.POSIX
 import System.Environment
 import System.IO
 import System.FilePath
+import System.Process
+import Turtle (NominalDiffTime)
+import Turtle.Prelude
 
 width :: Int -> String -> String
 width n s
@@ -23,3 +31,15 @@ main = do
   let icon_num = truncate (fromIntegral load * (8 % 100))
   let icon_file = home </> "util/xpm-status-icons/icons/battery/" </> icon_cat <> show icon_num <> ".xpm"
   putStrLn ("<icon=" <> icon_file <> "/> " <> width 3 (show load) <> "%")
+  when (ac == 0 && icon_num <= 1) $ do
+    time <- (accessTime <$> stat "/tmp/bat-status") `catch` (\(_ :: IOError) -> return 0)
+    now <- utcTimeToPOSIXSeconds <$> date
+    when (now - time >= 60) $ do
+      act <- readProcess "dunstify"
+        [ "-i", icon_file
+        , "-a", "bat-status"
+        , "-h", "string:x-canonical-private-synchronous:bat-status"
+        , "-A", "hide,hide"
+        , "Battery low (" <> show load <> "%)"]
+        ""
+      when (lines act /= ["1"]) $ touch "/tmp/bat-status"
