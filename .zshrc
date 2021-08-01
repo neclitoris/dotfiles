@@ -33,6 +33,7 @@ compdef _git config=git
 autoload -U +X compinit && compinit
 autoload -U +X bashcompinit && bashcompinit
 source "$HOME/.completions/tldr"
+source "$HOME/.cargo/env"
 source /usr/share/fzf/completion.zsh
 source /usr/share/fzf/key-bindings.zsh
 
