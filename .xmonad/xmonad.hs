@@ -297,6 +297,7 @@ myLayoutHook =
 myStartupHook = do
     spawn "(ps -e | grep pasystray) || pasystray -a"
     spawn "(ps -e | grep nm-applet) || nm-applet"
+    spawn "(ps -e | grep blueman-applet) || blueman-applet"
 
 myConfig xmproc =
   Nav.navigation2DP
