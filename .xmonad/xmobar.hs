@@ -68,7 +68,7 @@ config = defaultConfig
             <fn=1></fn> %date%
              <fn=1></fn>
              <action=`alacritty -e zsh -c 'checkupdates | vim -R -'` button=1>
-            <action=`alacritty -e zsh -c 'yay -Syu'` button=3>
+            <action=`alacritty -e zsh -c 'yay -Syu; echo "Press any key..."; read -k'` button=3>
             %updates%
             </action>
             </action>
