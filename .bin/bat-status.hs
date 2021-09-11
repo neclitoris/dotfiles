@@ -31,7 +31,7 @@ main = do
   let icon_num = truncate (fromIntegral load * (8 % 100))
   let icon_file = home </> "util/xpm-status-icons/icons/battery/" </> icon_cat <> show icon_num <> ".xpm"
   putStrLn ("<icon=" <> icon_file <> "/> " <> width 3 (show load) <> "%")
-  when (ac == 0 && icon_num <= 1) $ do
+  when (ac == 0 && load <= 20) $ do
     time <- (accessTime <$> stat "/tmp/bat-status") `catch` (\(_ :: IOError) -> return 0)
     now <- utcTimeToPOSIXSeconds <$> date
     when (now - time >= 60) $ do
