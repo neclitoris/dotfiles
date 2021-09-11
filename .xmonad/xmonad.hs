@@ -316,5 +316,5 @@ myConfig xmproc =
 
 main :: IO ()
 main = do
-    xmproc <- spawnPipe "xmobar $HOME/.xmonad/xmobarrc"
+    xmproc <- spawnPipe "my-xmobar $HOME/.xmonad/xmobarrc"
     xmonad $ myConfig xmproc

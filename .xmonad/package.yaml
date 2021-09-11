@@ -1,0 +1,87 @@
+name:                my-xmonad
+version:             0.1.0.0
+
+dependencies:
+- base
+# - xmonad >= 0.15
+# - xmonad-contrib >= 0.16
+# - xmobar
+- hint >= 0.9.0.4
+- data-default
+- containers
+- directory
+- filepath
+- process
+- string-interpolate
+
+executables:
+  my-xmonad:
+    main: xmonad.hs
+    source-dirs: .
+    dependencies:
+    - xmonad
+    - xmonad-contrib
+  my-xmobar:
+    main: xmobar.hs
+    source-dirs: .
+    dependencies:
+    - xmobar
+    ghc-options:
+    - -threaded
+
+default-extensions:
+- ApplicativeDo
+- BangPatterns
+- BinaryLiterals
+- BlockArguments
+- ConstrainedClassMethods
+- ConstraintKinds
+- DataKinds
+- DefaultSignatures
+- DeriveDataTypeable
+- DeriveFunctor
+- DeriveGeneric
+- DeriveLift
+- DeriveTraversable
+- DerivingStrategies
+- DerivingVia
+- DuplicateRecordFields
+- EmptyCase
+- EmptyDataDeriving
+- ExistentialQuantification
+- ExplicitForAll
+- FlexibleContexts
+- FlexibleInstances
+- FunctionalDependencies
+- GADTs
+- GeneralizedNewtypeDeriving
+- HexFloatLiterals
+- ImportQualifiedPost
+- InstanceSigs
+- KindSignatures
+- LambdaCase
+- LiberalTypeSynonyms
+- MultiParamTypeClasses
+- NamedFieldPuns
+- NamedWildCards
+- NumDecimals
+- NumericUnderscores
+- OverloadedStrings
+- PatternSynonyms
+- PolyKinds
+- PostfixOperators
+- QuantifiedConstraints
+- QuasiQuotes
+- RankNTypes
+- RecordWildCards
+- ScopedTypeVariables
+- StandaloneDeriving
+- StandaloneKindSignatures
+- StrictData
+- TupleSections
+- TypeApplications
+- TypeFamilies
+- TypeOperators
+- TypeSynonymInstances
+- UnicodeSyntax
+- ViewPatterns
