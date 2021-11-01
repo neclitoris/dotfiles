@@ -2,16 +2,16 @@
 
 # maim -u | convert - -blur 11x11 RGB:- | i3lock --raw 1920x1080:rgb --image /dev/stdin
 i3lock -i $(get-wallpaper) -k -n \
-    --time-font 'Source Code Pro' --timecolor '839496' --timesize 32 \
-    --date-font 'Source Code Pro' --datecolor '839496' --datesize 16 --datestr "%a %F" \
-    --datepos 'tx:ty+20' \
-    --insidevercolor '00000000' --insidewrongcolor '00000000' --insidecolor '00000000' \
-    --ringvercolor '268bd2' --ringwrongcolor 'dc322f' --ringcolor '586e75' \
-    --verifcolor '839496' --keyhlcolor '859900' --bshlcolor 'dc322f' \
-    --veriftext '' --wrongtext '' --noinputtext '' --locktext '' \
+     --time-font 'Source Code Pro' --time-color '839496' --time-size 32 \
+    --date-font 'Source Code Pro' --date-color '839496' --date-size 16 --date-str "%a %F" \
+    --date-pos 'tx:ty+20' \
+    --insidever-color '00000000' --insidewrong-color '00000000' --inside-color '00000000' \
+    --ringver-color '268bd2' --ringwrong-color 'dc322f' --ring-color '586e75' \
+    --verif-color '839496' --keyhl-color '859900' --bshl-color 'dc322f' \
+    --verif-text '' --wrong-text '' --noinput-text '' --lock-text '' \
     --layout-font 'Source Code Pro' \
-    --keylayout 1 --layoutcolor 'dc322f' --layoutsize 12 \
-    --layoutpos 'tx:ty+48' \
+    --keylayout 1 --layout-color 'dc322f' --layout-size 12 \
+    --layout-pos 'tx:ty+48' \
     --radius 110 --ring-width 6 \
     --pass-media-keys --pass-screen-keys --pass-volume-keys --pass-power-keys \
     --composite "$@"
