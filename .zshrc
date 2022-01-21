@@ -24,7 +24,7 @@ plugins=(autoenv
 source $ZSH/oh-my-zsh.sh
 unalias gm
 
-compdef _git config=git
+compdef _git config
 
 # other things init
 # source "$UTIL/torch/install/bin/torch-activate"
@@ -39,3 +39,5 @@ source /usr/share/fzf/key-bindings.zsh
 
 setopt nosharehistory
 setopt no_complete_aliases
+
+if [ -e /home/neclitoris/.nix-profile/etc/profile.d/nix.sh ]; then . /home/neclitoris/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
