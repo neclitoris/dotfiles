@@ -7,7 +7,8 @@ case "${clip[@]}" in
         append=" | tee /tmp/img.png | xclip -target image/png -sel clipboard"
         ;;
     "")
-        append=" $(date +\"$HOME/image/Screenshots/%FT%T.png\")"
+        mkdir -p "$HOME/pic/Screenshots"
+        append=" $(date +\"$HOME/pic/Screenshots/%FT%T.png\")"
         ;;
     *)
         echo "usage: screenshot.sh [-c] -m (full|window|region)"

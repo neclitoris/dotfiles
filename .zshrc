@@ -1,6 +1,6 @@
 # environment
 source "$HOME/.profile"
-source "$HOME/.env"
+source "$HOME/.environment"
 source "$HOME/.path"
 source "$HOME/.aliases"
 
