@@ -237,12 +237,12 @@ myKeymap =
     , ("M-<Down>", sendMessage MirrorShrink)
     , ("M-<Up>", sendMessage MirrorExpand)
     , ("C-M-l"    , spawn screenLocker)
-    , ("<XF86Calculator>"   , spawn "screenshot.sh -m full")
-    , ("M1-<XF86Calculator>", spawn "screenshot.sh -m window")
-    , ("S-<XF86Calculator>" , spawn "screenshot.sh -m region")
-    , ("C-<XF86Calculator>" , spawn "screenshot.sh -m full -c")
-    , ("C-M1-<XF86Calculator>" , spawn "screenshot.sh -m window -c")
-    , ("C-S-<XF86Calculator>" , spawn "screenshot.sh -m region -c")
+    , ("<Print>"   , spawn "screenshot.sh -m full")
+    , ("M1-<Print>", spawn "screenshot.sh -m window")
+    , ("S-<Print>" , spawn "screenshot.sh -m region")
+    , ("C-<Print>" , spawn "screenshot.sh -m full -c")
+    , ("C-M1-<Print>" , spawn "screenshot.sh -m window -c")
+    , ("C-S-<Print>" , spawn "screenshot.sh -m region -c")
     , ( "M-f"
       , sendMessage (Toggle NBFULL) >> sendMessage ToggleStruts >> toggleSmartSpacing
       )
@@ -255,16 +255,23 @@ myKeymap =
     , ("M-S-t", myTreeSelect)
     , ("M-p", XP.shellPrompt myXPConfig)
     , ("M-S-p", runInTerminal myXPConfig)
-    , ("M-S-x", XP.xmonadPrompt myXPConfig)
+    -- , ("M-S-x", XP.xmonadPrompt myXPConfig)
     , ("C-M-h", withFocused hideWindow)
     , ("C-M-S-h", popOldestHiddenWindow)
     , ("M--", incScreenWindowSpacing 2)
     , ("M-=", decScreenWindowSpacing 2)
-    , ("M-e", uninstallSignalHandlers >> mkXPromptWithModes [XPT EvalPrompt] myXPConfig >> installSignalHandlers)
-    , ("M-S-e", spawn $ terminalEmulator <> " -e ghci")
+    , ("M-x", uninstallSignalHandlers >> mkXPromptWithModes [XPT EvalPrompt] myXPConfig >> installSignalHandlers)
+    , ("M-S-x", spawn $ terminalEmulator <> " -e ghci")
     , ("C-M-p", windows Copy.copyToAll)
     , ("C-M-S-p", Copy.killAllOtherCopies)
     ]
+    ++
+    [ (otherModMasks ++ "M-" ++ [key], action tag)
+      | (tag, key)  <- zip myWorkspaces "123456789"
+      , (otherModMasks, action) <- [ ("", windows . W.view) -- was W.greedyView
+                                      , ("S-", windows . W.shift)]
+    ]
+
 
 myMouse = [((mod4Mask, button3), \w -> focus w >> Flex.mouseResizeWindow w)]
 
@@ -286,6 +293,8 @@ myXmobar xmproc = dynamicLogWithPP xmobarPP
     , ppSep     = xmobarColor (colorToStr base02) (colorToStr base00) " <fn=1>\xe0b1</fn>"
     }
 
+myWorkspaces = ["1","2","3","4","5","6","7","8","9"]
+
 myLayoutHook =
     hiddenWindows
         $   avoidStruts
@@ -298,6 +307,7 @@ myStartupHook = do
     spawn "(ps -e | grep pasystray) || pasystray -a"
     spawn "(ps -e | grep nm-applet) || nm-applet"
     spawn "(ps -e | grep blueman-applet) || blueman-applet"
+    spawn "(ps -e | grep yandex-disk-indicator) || yandex-disk-indicator"
 
 myConfig xmproc =
   Nav.navigation2DP
@@ -310,6 +320,7 @@ myConfig xmproc =
       , layoutHook         = myLayoutHook
       , logHook            = myXmobar xmproc
       , manageHook         = myManageHook <+> def
+      , workspaces         = myWorkspaces
       , borderWidth        = 0
       } `additionalKeysP` myKeymap
         `additionalMouseBindings` myMouse
