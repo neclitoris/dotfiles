@@ -1,4 +1,5 @@
-#!/home/neclitoris/.bin/runghc-cached.sh
+#!/usr/bin/env stack
+-- stack script --snapshot lts-18.10 --package turtle --package filepath --package process
 
 import Data.Char
 import Data.Ratio

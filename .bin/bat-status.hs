@@ -1,4 +1,5 @@
-#!/home/neclitoris/.bin/runghc-cached.sh
+#!/usr/bin/env stack
+-- stack script --snapshot lts-18.10 --package turtle --package filepath --package process --package time
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE OverloadedStrings #-}
 
