@@ -28,7 +28,7 @@ import           XMonad.Hooks.DynamicLog
 import           XMonad.Hooks.EwmhDesktops
 import           XMonad.Hooks.InsertPosition
 import           XMonad.Hooks.ManageDocks
-import           XMonad.Hooks.ManageHelpers
+import           XMonad.Hooks.ManageHelpers hiding (desktop)
 import           XMonad.Layout.MultiToggle
 import           XMonad.Layout.MultiToggle.Instances
 import           XMonad.Layout.NoBorders
@@ -223,7 +223,7 @@ myTreeSelect = do
         ]
     attachSession s = runInTerm "" (printf "tmux attach-session -t %s" s)
     killSession s = spawn (printf "tmux kill-session -t %s" s)
-    renameSession s = XP.mkXPrompt (namedPrompt "Enter new name: ") myXPConfig (XP.mkComplFunFromList []) (spawn . printf "tmux rename-session -t %s %s" s)
+    renameSession s = XP.mkXPrompt (namedPrompt "Enter new name: ") myXPConfig (XP.mkComplFunFromList myXPConfig []) (spawn . printf "tmux rename-session -t %s %s" s)
 
 runInTerminal :: XP.XPConfig -> X ()
 runInTerminal c = do
@@ -279,10 +279,9 @@ myXmobar :: Handle -> X ()
 myXmobar xmproc = dynamicLogWithPP xmobarPP
     { ppOutput  = hPutStrLn xmproc . xmobarColor "" (colorToStr base00)
     , ppTitle   = xmobarColor (colorToStr base0) (colorToStr base2)
-                  . ((  "<fn=1>"
-                     ++ xmobarColor (colorToStr base00) (colorToStr base0) "\xe0b0"
+                  . ((  xmobarColor (colorToStr base00) (colorToStr base0) "\xe0b0"
                      ++ xmobarColor (colorToStr base0) (colorToStr base2) "\xe0b0"
-                     ++ "</fn> "
+                     ++ " "
                      ) ++
                     )
                   . shorten 70
@@ -290,7 +289,8 @@ myXmobar xmproc = dynamicLogWithPP xmobarPP
     , ppHidden  = xmobarColor (colorToStr base1) (colorToStr base00)
                       . (\s -> xmobarAction ("xdotool key super+" ++ s) "1" s)
     , ppCurrent = xmobarColor (colorToStr base02) (colorToStr base00)
-    , ppSep     = xmobarColor (colorToStr base02) (colorToStr base00) " <fn=1>\xe0b1</fn>"
+    , ppSep     = xmobarColor (colorToStr base02) (colorToStr base00) " \xe0b1"
+    , ppWsSep   = "  "
     }
 
 myWorkspaces = ["1","2","3","4","5","6","7","8","9"]

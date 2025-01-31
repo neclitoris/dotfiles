@@ -1,4 +1,5 @@
 import Data.String.Interpolate ( __i )
+import Data.List ( intercalate )
 import Xmobar
 
 main :: IO ()
@@ -30,19 +31,20 @@ green = "#859900"
 
 -- 
 
+mkfonts list = intercalate "," $ map fst list ++ reverse (map snd list)
+
 config :: Config
 config = defaultConfig
-        { font = [__i|xft:Source Code Pro for Powerline:pixelsize=16:antialiase=true:Regular ,FontAwesome:pixelsize=16
-                    ,Noto Sans CJK SC:pixelsize=16:antialiase=true
-                    ,Noto Sans CJK JP:pixelsize=16:antialiase=true
-                    ,Noto Sans CJK KR:pixelsize=16:antialiase=true|]
-        , additionalFonts = ["xft:Source Code Pro for Powerline:pixelsize=18:antialiase=true:Regular"]
+        { font = mkfonts [ ("Source Code Pro for Powerline", "Regular 14")
+                         , ("Noto Sans CJK SC", "14")
+                         , ("Noto Sans CJK JP", "14")
+                         , ("Noto Sans CJK KR", "14")
+                         ]
         , position = Static { xpos = 8, ypos = 8, width = 1904, height = 22 }
         , bgColor = base2
         , fgColor = base0
         , alpha = 255
-        , textOffset = 16
-        , textOffsets = [17]
+        , textOffset = 0
         , commands = [ Run $ Com "cpu-load.hs" [] "cpu" 10
                      , Run $ Com "mem-load.hs" [] "memory" 10
                      , Run $ Com "bat-status.hs" [] "battery" 10
@@ -58,20 +60,20 @@ config = defaultConfig
         , iconRoot = "/home/neclitoris/image/icons/"
         , template = (mconcat . lines)
           [__i|<fc=#{base02},#{base00}> </fc>%UnsafeStdinReader% }{
-            <fn=1></fn> %cpu%
-             <fn=1></fn> %memory%
-             <fn=1></fn> %battery%
-             <fn=1><fc=#{base0}></fc></fn>
+             %cpu%
+              %memory%
+              %battery%
+             <fc=#{base0}></fc>
             <fc=#{red},#{base0}> %kbd% </fc>
-            <fn=1><fc=#{base00},#{base0}></fc></fn>
+            <fc=#{base00},#{base0}></fc>
             <fc=#{base02},#{base00}>
-            <fn=1></fn> %date%
-             <fn=1></fn>
+             %date%
+             
              <action=`alacritty -e zsh -c 'checkupdates | vim -R -'` button=1>
             <action=`alacritty -e zsh -c 'yay -Syu; echo "Press any key..."; read -k'` button=3>
             %updates%
             </action>
             </action>
-             <fn=1></fn>%traypad%
+             %traypad%
              </fc>|]
         }
