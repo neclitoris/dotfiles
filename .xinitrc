@@ -2,6 +2,8 @@
 
 export GTK_THEME="Material-Black-Blueberry-Suru"
 
+exec >~/.xsession-errors 2>&1
+
 xrandr --setprovideroutputsource modesetting NVIDIA-0
 xrandr --auto
 xrandr --dpi 144
