@@ -1,5 +1,5 @@
 #!/usr/bin/env stack
--- stack script --snapshot lts-18.10
+-- stack script --snapshot lts-18.10 --optimize
 
 import Control.Monad
 import System.IO

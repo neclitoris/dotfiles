@@ -1,5 +1,5 @@
 #!/usr/bin/env stack
--- stack script --snapshot lts-18.10 --package turtle --package filepath --package process
+-- stack script --snapshot lts-18.10 --package turtle --package filepath --package process  --optimize
 
 import Data.Char
 import Data.Ratio
