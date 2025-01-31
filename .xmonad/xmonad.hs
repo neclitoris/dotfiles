@@ -284,7 +284,7 @@ myXmobar xmproc = dynamicLogWithPP xmobarPP
                      ++ " "
                      ) ++
                     )
-                  . shorten 70
+                  . shorten 60
     , ppLayout  = const ""
     , ppHidden  = xmobarColor (colorToStr base1) (colorToStr base00)
                       . (\s -> xmobarAction ("xdotool key super+" ++ s) "1" s)
