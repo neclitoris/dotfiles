@@ -127,7 +127,8 @@ endif
 let g:ycm_semantic_triggers.tex = g:vimtex#re#youcompleteme
 let g:vimtex_compiler_progname = 'nvr'
 let g:vimtex_view_method = 'zathura'
-let g:tex_conceal=''
+let g:vimtex_syntax_conseal_disable=1
+" let g:tex_conceal=''
 let g:tex_flavor = 'latex'
 
 let g:ycm_semantic_triggers.haskell = ['.']
@@ -212,7 +213,7 @@ set fillchars+=eob:\
 set scrolloff=0
 set backspace=indent,eol,start
 set mouse=a
-set conceallevel=1
+set conceallevel=0
 
 " Cursor style
 " au VimEnter,InsertLeave * silent execute '!echo -ne "\e[4 q"' | redraw!
@@ -371,6 +372,6 @@ augroup END
 
 set noswapfile
 
-set guifont=Hasklig:h15
-set guioptions-=rL
-set guioptions+=k
+" set guifont=Hasklig:h15
+" set guioptions-=rL
+" set guioptions+=k

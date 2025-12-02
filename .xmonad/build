@@ -4,8 +4,9 @@
 
 set -e
 
-stack build :my-xmobar
-stack install :my-xmobar
-stack build :my-xmonad
-stack install :my-xmonad --local-bin-path bin/ --verbosity error
-mv bin/my-xmonad "$1"
+cd ~/.xmonad
+
+stack install my-xmonad:xmobar --local-bin-path bin/
+stack install my-xmonad:xmonad --local-bin-path bin/
+ln -sf "$PWD/bin/xmonad" ~/.local/bin/xmonad
+ln -sf "$PWD/bin/xmobar" ~/.local/bin/xmobar

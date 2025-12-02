@@ -17,7 +17,7 @@ xhost +si:localuser:root
 
 [[ -f ~/.Xresources ]] && xrdb -merge -I$HOME ~/.Xresources
 
-picom --experimental-backends &
+picom &
 # feh --bg-max ~/image/Wallpapers/rope\ giant.png &
 nitrogen --restore &
 

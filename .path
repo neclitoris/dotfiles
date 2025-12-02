@@ -1,4 +1,5 @@
 PATH="$UTIL/texlive/bin/x86_64-linux:$PATH"
+PATH="/usr/local/texlive/2025/bin/x86_64-linux:$PATH"
 PATH="/usr/local/cuda-10.1/bin:$PATH"
 PATH="$HOME/.bin:$PATH"
 PATH="$HOME/.local/bin:$PATH"

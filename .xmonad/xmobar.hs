@@ -51,7 +51,7 @@ config = defaultConfig
                      , Run $ Com "updates" [] "updates" 36000
                      , Run $ Swap [] 10
                      , Run $ Date "%a %F %H:%M:%S" "date" 10
-                     , Run UnsafeStdinReader
+                     , Run UnsafeXMonadLog
                      , Run $ Kbd [("us", "US"), ("ru", "RU")]
                      , Run $ Com "xmobar-stalonetray-pad" [] "traypad" 10
                      ]
@@ -59,7 +59,7 @@ config = defaultConfig
         , alignSep = "}{"
         , iconRoot = "/home/neclitoris/image/icons/"
         , template = (mconcat . lines)
-          [__i|<fc=#{base02},#{base00}> </fc>%UnsafeStdinReader% }{
+          [__i|<fc=#{base02},#{base00}> </fc>%UnsafeXMonadLog% }{
              %cpu%
               %memory%
               %battery%

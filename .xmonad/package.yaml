@@ -3,9 +3,9 @@ version:             0.1.0.0
 
 dependencies:
 - base
-# - xmonad >= 0.15
-# - xmonad-contrib >= 0.16
-# - xmobar
+- xmonad
+- xmonad-contrib
+- xmobar
 - hint >= 0.9.0.4
 - data-default
 - containers
@@ -13,15 +13,16 @@ dependencies:
 - filepath
 - process
 - string-interpolate
+- exceptions
 
 executables:
-  my-xmonad:
+  xmonad:
     main: xmonad.hs
     source-dirs: .
     dependencies:
     - xmonad
     - xmonad-contrib
-  my-xmobar:
+  xmobar:
     main: xmobar.hs
     source-dirs: .
     dependencies:

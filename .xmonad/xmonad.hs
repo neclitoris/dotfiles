@@ -18,7 +18,7 @@ import           System.FilePath.Posix
 import qualified System.Process                as P
 import           System.IO
 
-import           XMonad
+import           XMonad                        hiding (recompile)
 import qualified XMonad.Actions.CopyWindow     as Copy
 import qualified XMonad.Actions.FlexibleResize as Flex
 import           XMonad.Actions.Navigation2D   as Nav
@@ -26,9 +26,11 @@ import qualified XMonad.Actions.TreeSelect     as TS
 import           XMonad.Config.Gnome
 import           XMonad.Hooks.DynamicLog
 import           XMonad.Hooks.EwmhDesktops
+import           XMonad.Hooks.StatusBar
+import           XMonad.Hooks.StatusBar.PP
 import           XMonad.Hooks.InsertPosition
 import           XMonad.Hooks.ManageDocks
-import           XMonad.Hooks.ManageHelpers hiding (desktop)
+import           XMonad.Hooks.ManageHelpers    hiding (desktop)
 import           XMonad.Layout.MultiToggle
 import           XMonad.Layout.MultiToggle.Instances
 import           XMonad.Layout.NoBorders
@@ -41,6 +43,8 @@ import           XMonad.Prompt.Shell           as XP
 import           XMonad.Prompt.XMonad          as XP
 import qualified XMonad.StackSet               as W
 import           XMonad.Util.EZConfig
+import           XMonad.Util.Loggers
+import           XMonad.Util.SpawnOnce
 import           XMonad.Util.Run
 
 -- Solarized colorscheme
@@ -119,7 +123,7 @@ getTmuxSessions = do
                     ""
 
 myXPConfig :: XP.XPConfig
-myXPConfig = def { XP.font = "xft:Source Code Pro for Powerline:pixelsize=24:antialiase=true"
+myXPConfig = def { XP.font = "xft:Source Code Pro for Powerline-12"
                  , XP.bgColor = colorToStr base2
                  , XP.fgColor = colorToStr base0
                  , XP.bgHLight = colorToStr base00
@@ -132,19 +136,19 @@ myXPConfig = def { XP.font = "xft:Source Code Pro for Powerline:pixelsize=24:ant
                  }
 
 myTSConfig :: TS.TSConfig a
-myTSConfig = TS.tsDefaultConfig { TS.ts_font = "xft:Source Code Pro for Powerline:pixelsize=16:antialiase=true"
-                                , TS.ts_background = base2 - 0x3f000000
-                                , TS.ts_highlight  = (base03, base00)
-                                , TS.ts_node       = (base0, base2)
-                                , TS.ts_nodealt    = (base0, base2)
-                                , TS.ts_extra      = base02
-                                }
+myTSConfig = def { TS.ts_font = "xft:Source Code Pro for Powerline-8"
+                 , TS.ts_background = base2 - 0x3f000000
+                 , TS.ts_highlight  = (base03, base00)
+                 , TS.ts_node       = (base0, base2)
+                 , TS.ts_nodealt    = (base0, base2)
+                 , TS.ts_extra      = base02
+                 }
 
 desktop :: IO [FilePath]
 desktop = do
     home <- getHomeDirectory
     let comps = home
-    let desk = comps </> "desktop"
+    let desk = comps </> "Desktop"
     L.sort . fmap (desk </>) . filter ((== ".desktop") . takeExtension) <$> listDirectory desk
 
 data NoPrompt = NoPrompt
@@ -173,15 +177,16 @@ data EvalPrompt = EvalPrompt
 instance XP.XPrompt EvalPrompt where
   showXPrompt EvalPrompt = "haskell> "
   commandToComplete _ = id
-  completionFunction EvalPrompt s = do
-    res <- I.runInterpreter $ do
-            I.setImports ["Prelude", "Data.Ratio"]
-            res <- I.eval s
-            typ <- I.typeOf s
-            return $ res <> " :: " <> typ
-    case res of
-      Left err -> return [show err]
-      Right s -> return [s]
+  completionFunction EvalPrompt s =
+    bracket_ uninstallSignalHandlers installSignalHandlers $ do
+      res <- I.runInterpreter $ do
+              I.setImports ["Prelude", "Data.Ratio"]
+              res <- I.eval s
+              typ <- I.typeOf s
+              return $ res <> " :: " <> typ
+      case res of
+        Left err -> return [show err]
+        Right s -> return [s]
 
 myTreeSelect :: X ()
 myTreeSelect = do
@@ -230,19 +235,24 @@ runInTerminal c = do
   cmds <- io getCommands
   mkXPrompt (namedShellPrompt "Run in terminal: ") c (getShellCompl cmds $ searchPredicate c) (spawn . printf "%s -e %s" terminalEmulator)
 
+recompile :: MonadIO m => m ()
+recompile = io $ bracket_ uninstallSignalHandlers installSignalHandlers $ void $ do
+  P.readCreateProcess (P.shell "~/.xmonad/build") ""
+
 myKeymap :: [(String, X ())]
 myKeymap =
     [ ("M-<Left>", sendMessage Shrink)
     , ("M-<Right>", sendMessage Expand)
     , ("M-<Down>", sendMessage MirrorShrink)
     , ("M-<Up>", sendMessage MirrorExpand)
-    , ("C-M-l"    , spawn screenLocker)
-    , ("<Print>"   , spawn "screenshot.sh -m full")
+    , ("M-q", recompile >> restart "xmonad" True)
+    , ("C-M-l", spawn screenLocker)
+    , ("<Print>", spawn "screenshot.sh -m full")
     , ("M1-<Print>", spawn "screenshot.sh -m window")
-    , ("S-<Print>" , spawn "screenshot.sh -m region")
-    , ("C-<Print>" , spawn "screenshot.sh -m full -c")
-    , ("C-M1-<Print>" , spawn "screenshot.sh -m window -c")
-    , ("C-S-<Print>" , spawn "screenshot.sh -m region -c")
+    , ("S-<Print>", spawn "screenshot.sh -m region")
+    , ("C-<Print>", spawn "screenshot.sh -m full -c")
+    , ("C-M1-<Print>", spawn "screenshot.sh -m window -c")
+    , ("C-S-<Print>", spawn "screenshot.sh -m region -c")
     , ( "M-f"
       , sendMessage (Toggle NBFULL) >> sendMessage ToggleStruts >> toggleSmartSpacing
       )
@@ -260,7 +270,7 @@ myKeymap =
     , ("C-M-S-h", popOldestHiddenWindow)
     , ("M--", incScreenWindowSpacing 2)
     , ("M-=", decScreenWindowSpacing 2)
-    , ("M-x", uninstallSignalHandlers >> mkXPromptWithModes [XPT EvalPrompt] myXPConfig >> installSignalHandlers)
+    , ("M-x", mkXPromptWithModes [XPT EvalPrompt] myXPConfig)
     , ("M-S-x", spawn $ terminalEmulator <> " -e ghci")
     , ("C-M-p", windows Copy.copyToAll)
     , ("C-M-S-p", Copy.killAllOtherCopies)
@@ -275,10 +285,9 @@ myKeymap =
 
 myMouse = [((mod4Mask, button3), \w -> focus w >> Flex.mouseResizeWindow w)]
 
-myXmobar :: Handle -> X ()
-myXmobar xmproc = dynamicLogWithPP xmobarPP
-    { ppOutput  = hPutStrLn xmproc . xmobarColor "" (colorToStr base00)
-    , ppTitle   = xmobarColor (colorToStr base0) (colorToStr base2)
+myXmobarPP:: PP
+myXmobarPP = def
+    { ppTitle   = xmobarColor (colorToStr base0) (colorToStr base2)
                   . ((  xmobarColor (colorToStr base00) (colorToStr base0) "\xe0b0"
                      ++ xmobarColor (colorToStr base0) (colorToStr base2) "\xe0b0"
                      ++ " "
@@ -290,7 +299,7 @@ myXmobar xmproc = dynamicLogWithPP xmobarPP
                       . (\s -> xmobarAction ("xdotool key super+" ++ s) "1" s)
     , ppCurrent = xmobarColor (colorToStr base02) (colorToStr base00)
     , ppSep     = xmobarColor (colorToStr base02) (colorToStr base00) " \xe0b1"
-    , ppWsSep   = "  "
+    , ppWsSep   = xmobarColor (colorToStr base02) (colorToStr base00) " "
     }
 
 myWorkspaces = ["1","2","3","4","5","6","7","8","9"]
@@ -304,12 +313,12 @@ myLayoutHook =
     where tall = ResizableTall 1 (3/100) (1/2) []
 
 myStartupHook = do
-    spawn "(ps -e | grep pasystray) || pasystray -a"
-    spawn "(ps -e | grep nm-applet) || nm-applet"
-    spawn "(ps -e | grep blueman-applet) || blueman-applet"
-    spawn "(ps -e | grep yandex-disk-indicator) || yandex-disk-indicator"
+    spawnOnce "pasystray -a"
+    spawnOnce "nm-applet"
+    spawnOnce "blueman-applet"
+    spawnOnce "yandex-disk-indicator"
 
-myConfig xmproc =
+myConfig =
   Nav.navigation2DP
     def { Nav.defaultTiledNavigation = Nav.sideNavigation }
     ("k", "h", "j", "l") [("M-", Nav.windowGo), ("M-S-", Nav.windowSwap)] False
@@ -318,14 +327,17 @@ myConfig xmproc =
       , terminal           = terminalEmulator
       , startupHook        = myStartupHook
       , layoutHook         = myLayoutHook
-      , logHook            = myXmobar xmproc
       , manageHook         = myManageHook <+> def
       , workspaces         = myWorkspaces
       , borderWidth        = 0
       } `additionalKeysP` myKeymap
         `additionalMouseBindings` myMouse
 
+mySB = statusBarProp "xmobar" (pure myXmobarPP)
+
 main :: IO ()
 main = do
-    xmproc <- spawnPipe "my-xmobar $HOME/.xmonad/xmobarrc"
-    xmonad $ myConfig xmproc
+    dirs <- getDirectories
+    flip launch dirs
+     $ withSB mySB
+     $ myConfig

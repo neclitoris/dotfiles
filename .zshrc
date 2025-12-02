@@ -48,3 +48,4 @@ if [ -f '/home/neclitoris/yandex-cloud/path.bash.inc' ]; then source '/home/necl
 # The next line enables shell command completion for yc.
 if [ -f '/home/neclitoris/yandex-cloud/completion.zsh.inc' ]; then source '/home/neclitoris/yandex-cloud/completion.zsh.inc'; fi
 
+
