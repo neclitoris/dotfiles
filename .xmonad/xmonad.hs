@@ -192,9 +192,7 @@ myTreeSelect :: X ()
 myTreeSelect = do
     tmuxSessions <- io getTmuxSessions
     desktopFiles <- io desktop
-    let tree =  [ Node (TS.TSNode "quicklaunch" "some regularly used apps" (return ()))
-                     (map (\(name, com) -> Node (TS.TSNode name "" (spawn com)) []) commonApps)
-                , Node (TS.TSNode "desktop" "" (return ()))
+    let tree =  [ Node (TS.TSNode "desktop" "" (return ()))
                      (map (\file -> Node (TS.TSNode (desktopName file) "" (spawn ("dex " ++ file))) []) desktopFiles)
                 , Node (TS.TSNode "tmux" "current tmux sessions" (return ()))
                      (map (\s -> Node (TS.TSNode s "" (attachSession s)) (manipSession s)) tmuxSessions)
@@ -205,14 +203,6 @@ myTreeSelect = do
     TS.treeselectAction myTSConfig tree
   where
     desktopName = dropExtension . takeFileName
-    -- quicklaunch tab
-    commonApps =
-        [ ("firefox" , "firefox")
-        , ("telegram", "telegram-desktop")
-        , ("discord" , "discord")
-        , ("steam"   , "steam")
-        , ("gimp"    , "gimp")
-        ]
     -- power tab
     powerComs =
         [ ("shutdown"   , "systemctl poweroff")
@@ -302,7 +292,7 @@ myXmobarPP = def
     , ppWsSep   = xmobarColor (colorToStr base02) (colorToStr base00) " "
     }
 
-myWorkspaces = ["1","2","3","4","5","6","7","8","9"]
+myWorkspaces = map show [1..9]
 
 myLayoutHook =
     hiddenWindows
@@ -313,7 +303,7 @@ myLayoutHook =
     where tall = ResizableTall 1 (3/100) (1/2) []
 
 myStartupHook = do
-    spawnOnce "pasystray -a"
+    spawnOnce "pasystray --notify=none --notify=sink_default --notify=source_default --notify=new"
     spawnOnce "nm-applet"
     spawnOnce "blueman-applet"
     spawnOnce "yandex-disk-indicator"
