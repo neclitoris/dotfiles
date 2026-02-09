@@ -15,9 +15,9 @@ width n s
 readline = readIO . takeWhile isDigit
 
 main = do
-  loads <- words <$> readProcess "neofetch" ["memory"] ""
-  used <- readline (loads !! 1) :: IO Int
-  total <- readline (loads !! 3) :: IO Int
+  loads <- words . (!! 1) . lines <$> readProcess "free" ["-m"] ""
+  used <- readline (loads !! 2) :: IO Int
+  total <- readline (loads !! 1) :: IO Int
   home <- getEnv "HOME"
   let load = used % total
   let icon_num = truncate (load * 8)

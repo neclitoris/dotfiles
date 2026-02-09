@@ -24,7 +24,7 @@ case "${mode[@]}" in
         com="maim -u -i $(xdotool getactivewindow)"
         ;;
     "-m region")
-        import -window root bmp:- | feh -FZ -&
+        maim -u | feh -FZ -&
         sleep .5
         com="maim -u -s"
         ;;
