@@ -38,7 +38,7 @@ source /usr/share/fzf/completion.zsh
 source /usr/share/fzf/key-bindings.zsh
 
 setopt nosharehistory
-setopt no_complete_aliases
+unsetopt complete_aliases
 
 if [ -e /home/neclitoris/.nix-profile/etc/profile.d/nix.sh ]; then . /home/neclitoris/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
 
