@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# maim -u | convert - -blur 11x11 RGB:- | i3lock --raw 1920x1080:rgb --image /dev/stdin
+xset dpms 10 0
+
 i3lock -i $(get-wallpaper) -k -n \
      --time-font 'Source Code Pro' --time-color '839496' --time-size 32 \
     --date-font 'Source Code Pro' --date-color '839496' --date-size 16 --date-str "%a %F" \
@@ -14,4 +15,8 @@ i3lock -i $(get-wallpaper) -k -n \
     --layout-pos 'tx:ty+48' \
     --radius 110 --ring-width 6 \
     --pass-media-keys --pass-screen-keys --pass-volume-keys --pass-power-keys \
-    --composite "$@"
+    --composite "$@" &
+
+wait $!
+
+xset dpms 0 0

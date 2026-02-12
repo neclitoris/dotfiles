@@ -5,3 +5,4 @@ export EDITOR="/usr/bin/nvim"
 export LESS=' -r'
 export TERMINAL='alacritty -e'
 export MANPAGER="nvim +Man!"
+export GPG_TTY=$(tty)
