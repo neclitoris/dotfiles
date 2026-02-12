@@ -5,4 +5,8 @@ export EDITOR="/usr/bin/nvim"
 export LESS=' -r'
 export TERMINAL='alacritty -e'
 export MANPAGER="nvim +Man!"
+
 export GPG_TTY=$(tty)
+gpg-connect-agent updatestartuptty /bye >/dev/null
+unset SSH_AGENT_PID
+SSH_AUTH_SOCK="${XDG_RUNTIME_DIR}/gnupg/S.gpg-agent.ssh"
