@@ -145,10 +145,8 @@ myTSConfig = def { TS.ts_font = "xft:Source Code Pro for Powerline-8"
                  }
 
 desktop :: IO [FilePath]
-desktop = do
-    home <- getHomeDirectory
-    let comps = home
-    let desk = comps </> "Desktop"
+desktop = bracket_ uninstallSignalHandlers installSignalHandlers $ do
+    desk <- (!! 0) . lines <$> P.readCreateProcess (P.proc "xdg-user-dir" ["DESKTOP"]) ""
     L.sort . fmap (desk </>) . filter ((== ".desktop") . takeExtension) <$> listDirectory desk
 
 data NoPrompt = NoPrompt
