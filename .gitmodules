@@ -1,0 +1,15 @@
+[submodule ".xmonad/xmonad"]
+	path = .xmonad/xmonad
+	url = https://github.com/xmonad/xmonad
+[submodule ".xmonad/xmonad-contrib"]
+	path = .xmonad/xmonad-contrib
+	url = https://github.com/xmonad/xmonad-contrib
+[submodule ".xmonad/xmobar-git"]
+	path = .xmonad/xmobar-git
+	url = https://codeberg.org/xmobar/xmobar.git
+[submodule "util/oh-my-zsh"]
+	path = util/oh-my-zsh
+	url = https://github.com/ohmyzsh/ohmyzsh.git
+[submodule "util/xpm-status-icons"]
+	path = util/xpm-status-icons
+	url = https://github.com/jumper149/xpm-status-icons
