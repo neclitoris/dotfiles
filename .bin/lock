@@ -15,6 +15,7 @@ i3lock -i $(get-wallpaper) -k -n \
     --layout-pos 'tx:ty+48' \
     --radius 110 --ring-width 6 \
     --pass-media-keys --pass-screen-keys --pass-volume-keys --pass-power-keys \
+    --fill \ 
     --composite "$@" &
 
 wait $!
