@@ -266,7 +266,7 @@ myKeymap =
     ++
     [ (otherModMasks ++ "M-" ++ [key], action tag)
       | (tag, key)  <- zip myWorkspaces "123456789"
-      , (otherModMasks, action) <- [ ("", windows . W.view) -- was W.greedyView
+      , (otherModMasks, action) <- [ ("", windows . W.greedyView)
                                       , ("S-", windows . W.shift)]
     ]
 
@@ -283,9 +283,10 @@ myXmobarPP = def
                     )
                   . shorten 60
     , ppLayout  = const ""
-    , ppHidden  = xmobarColor (colorToStr base1) (colorToStr base00)
+    , ppHidden  = xmobarColor (colorToStr base0) (colorToStr base00)
                       . (\s -> xmobarAction ("xdotool key super+" ++ s) "1" s)
     , ppCurrent = xmobarColor (colorToStr base02) (colorToStr base00)
+    , ppVisible = xmobarColor (colorToStr base02) (colorToStr base00)
     , ppSep     = xmobarColor (colorToStr base02) (colorToStr base00) " \xe0b1"
     , ppWsSep   = xmobarColor (colorToStr base02) (colorToStr base00) " "
     }

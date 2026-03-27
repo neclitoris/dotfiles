@@ -40,7 +40,7 @@ config = defaultConfig
                          , ("Noto Sans CJK JP", "14")
                          , ("Noto Sans CJK KR", "14")
                          ]
-        , position = Static { xpos = 8, ypos = 8, width = 1904, height = 22 }
+        , position = TopHM 22 8 8 8 0
         , bgColor = base2
         , fgColor = base0
         , alpha = 255

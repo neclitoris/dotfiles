@@ -7,7 +7,7 @@ exec >~/.xsession-errors 2>&1
 xrandr --setprovideroutputsource modesetting NVIDIA-0
 xrandr --auto
 xrandr --dpi 144
-xset dpms 0 0 0
+# xset dpms 0 0 0
 
 # setxkbmap -layout us,ru -option grp:alt_shift_toggle
 # xinput set-prop 'CUST0001:00 04F3:3147 Touchpad' 'libinput Natural Scrolling Enabled' 1
