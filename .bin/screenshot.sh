@@ -62,6 +62,5 @@ case "${mode[@]}" in
 esac
 
 sleep .1
-dunstify "$com $append"
 eval "$com $append"
 pkill -P $$

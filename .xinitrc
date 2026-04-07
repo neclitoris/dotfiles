@@ -19,6 +19,7 @@ xhost +si:localuser:root
 
 picom &
 # feh --bg-max ~/image/Wallpapers/rope\ giant.png &
+autorandr --change
 nitrogen --restore &
 
 killall notification-manager
