@@ -47,7 +47,6 @@ config = defaultConfig
         , textOffset = 0
         , commands = [ Run $ Com "cpu-load.hs" [] "cpu" 10
                      , Run $ Com "mem-load.hs" [] "memory" 10
-                     , Run $ Com "bat-status.hs" [] "battery" 10
                      , Run $ Com "updates" [] "updates" 36000
                      , Run $ Swap [] 10
                      , Run $ Date "%a %F %H:%M:%S" "date" 10
@@ -62,7 +61,6 @@ config = defaultConfig
           [__i|<fc=#{base02},#{base00}> </fc>%UnsafeXMonadLog% }{
              %cpu%
               %memory%
-              %battery%
              <fc=#{base0}></fc>
             <fc=#{red},#{base0}> %kbd% </fc>
             <fc=#{base00},#{base0}></fc>
