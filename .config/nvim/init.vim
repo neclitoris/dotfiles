@@ -292,10 +292,10 @@ vnoremap <leader>ld :YcmCompleter GetHover<CR>
 function InnerArgument()
     let l:cur = matchstr(getline('.'), '\%' . col('.') . 'c.')
     while 1
-        call search('\(,\|(\|{\|\[\|)\|}\|\]\)', 'b')
+        call search(',\|(\|{\|\[\|)\|}\|\]', 'bW')
         let l:cur = matchstr(getline('.'), '\%' . col('.') . 'c.')
         if l:cur == ')' || l:cur == '}' || l:cur == ']'
-            norm %
+            norm! %
         else
             break
         endif
@@ -303,52 +303,56 @@ function InnerArgument()
     call search('\S')
     let l:left = getpos('.')
     while 1
-        call search('\(,\|(\|{\|\[\|)\|}\|\]\)')
+        call search(',\|(\|{\|\[\|)\|}\|\]', 'W')
         let l:cur = matchstr(getline('.'), '\%' . col('.') . 'c.')
         if l:cur == '(' || l:cur == '{' || l:cur == '['
-            norm %
+            norm! %
         else
             break
         endif
     endwhile
     call search('\S', 'b')
-    norm v
+    norm! v
     call setpos('.', l:left)
 endfunction
 
 function AnArgument()
     let l:cur = matchstr(getline('.'), '\%' . col('.') . 'c.')
     while 1
-        call search('\(,\|(\|{\|\[\|)\|}\|\]\)', 'b')
+        call search(',\|\((\|{\|\[\)\@<=.\|)\|}\|\]', 'bcW')
         let l:cur = matchstr(getline('.'), '\%' . col('.') . 'c.')
         if l:cur == ')' || l:cur == '}' || l:cur == ']'
-            norm %
+            norm! %h
         else
             if l:cur == ','
-                call search('\S', 'b')
+                call search('\S', 'bW')
                 let l:cut_left = 1
+                norm vlol
+                call search(',\|(\|{\|\[', 'cW')
             else
                 let l:cut_left = 0
+                norm v
             endif
             break
         endif
     endwhile
-    norm l
-    let l:left = getpos('.')
     while 1
-        call search('\(,\|(\|{\|\[\|)\|}\|\]\)')
+        call search(',\|(\|{\|\[\|)\|}\|\]', 'W')
         let l:cur = matchstr(getline('.'), '\%' . col('.') . 'c.')
         if l:cur == '(' || l:cur == '{' || l:cur == '['
-            norm %
+            norm! %
         else
             if l:cur == ',' && !l:cut_left
-                call search('\S')
+                call search('\S', 'W')
             endif
             break
         endif
     endwhile
-    norm hv
-    call setpos('.', l:left)
+    if getpos('.')[2] == 1
+        norm k$
+    else
+        norm h
+    endif
 endfunction
 
 vnoremap ia :<c-u>call InnerArgument()<cr>
