@@ -1,51 +1,52 @@
-{-# LANGUAGE TypeSynonymInstances, DeriveDataTypeable, FunctionalDependencies, ScopedTypeVariables #-}
-import           Control.Exception
-import           Control.Monad
-import           Data.Char
-import           Data.Default
-import qualified Data.List                     as L
-import qualified Data.Map                      as M
-import           Data.Monoid
-import           Data.Tree
-import           Data.Word
-import qualified Language.Haskell.Interpreter  as I
-import           Numeric
-import           Text.Printf
-import           System.Directory
-import           System.Environment
-import           System.Exit
-import           System.FilePath.Posix
-import qualified System.Process                as P
-import           System.IO
+import Control.Exception
+import Control.Monad
+import Data.Char
+import Data.Default
+import Data.List qualified as L
+import Data.Map qualified as M
+import Data.Monoid
+import Data.Tree
+import Data.Word
+import Language.Haskell.Interpreter qualified  as I
+import Numeric
+import Text.Printf
+import System.Directory
+import System.Environment
+import System.Exit
+import System.FilePath.Posix
+import System.Process qualified as P
+import System.Posix qualified as Posix
+import System.IO
+import System.Timeout
 
-import           XMonad                        hiding (recompile)
-import qualified XMonad.Actions.CopyWindow     as Copy
-import qualified XMonad.Actions.FlexibleResize as Flex
-import           XMonad.Actions.Navigation2D   as Nav
-import qualified XMonad.Actions.TreeSelect     as TS
-import           XMonad.Config.Gnome
-import           XMonad.Hooks.DynamicLog
-import           XMonad.Hooks.EwmhDesktops
-import           XMonad.Hooks.StatusBar
-import           XMonad.Hooks.StatusBar.PP
-import           XMonad.Hooks.InsertPosition
-import           XMonad.Hooks.ManageDocks
-import           XMonad.Hooks.ManageHelpers    hiding (desktop)
-import           XMonad.Layout.MultiToggle
-import           XMonad.Layout.MultiToggle.Instances
-import           XMonad.Layout.NoBorders
-import           XMonad.Layout.ResizableTile
-import           XMonad.Layout.Spacing
-import           XMonad.Layout.Spiral
-import           XMonad.Layout.Hidden
-import           XMonad.Prompt                 as XP
-import           XMonad.Prompt.Shell           as XP
-import           XMonad.Prompt.XMonad          as XP
-import qualified XMonad.StackSet               as W
-import           XMonad.Util.EZConfig
-import           XMonad.Util.Loggers
-import           XMonad.Util.SpawnOnce
-import           XMonad.Util.Run
+import XMonad hiding (recompile)
+import XMonad.Actions.CopyWindow qualified as Copy
+import XMonad.Actions.FlexibleResize qualified as Flex
+import XMonad.Actions.Navigation2D qualified as Nav
+import XMonad.Actions.TreeSelect qualified as TS
+import XMonad.Config.Gnome
+import XMonad.Hooks.DynamicLog
+import XMonad.Hooks.EwmhDesktops
+import XMonad.Hooks.StatusBar
+import XMonad.Hooks.StatusBar.PP
+import XMonad.Hooks.InsertPosition
+import XMonad.Hooks.ManageDocks
+import XMonad.Hooks.ManageHelpers hiding (desktop)
+import XMonad.Layout.MultiToggle
+import XMonad.Layout.MultiToggle.Instances
+import XMonad.Layout.NoBorders
+import XMonad.Layout.ResizableTile
+import XMonad.Layout.Spacing
+import XMonad.Layout.Spiral
+import XMonad.Layout.Hidden
+import XMonad.Prompt as XP
+import XMonad.Prompt.Shell as XP
+import XMonad.Prompt.XMonad as XP
+import XMonad.StackSet qualified as W
+import XMonad.Util.EZConfig
+import XMonad.Util.Loggers
+import XMonad.Util.SpawnOnce
+import XMonad.Util.Run
 
 -- Solarized colorscheme
 
@@ -177,14 +178,31 @@ instance XP.XPrompt EvalPrompt where
   commandToComplete _ = id
   completionFunction EvalPrompt s =
     bracket_ uninstallSignalHandlers installSignalHandlers $ do
-      res <- I.runInterpreter $ do
+      bracket mkPipe cleanPipe $ \(outh, inh) -> do
+        pid <- Posix.forkProcess $ do
+            res <- I.runInterpreter $ do
               I.setImports ["Prelude", "Data.Ratio"]
-              res <- I.eval s
+              val <- I.eval s
               typ <- I.typeOf s
-              return $ res <> " :: " <> typ
-      case res of
-        Left err -> return [show err]
-        Right s -> return [s]
+              pure $ shorten 100 val <> " :: " <> typ
+            case res of
+              Left err -> hPrint inh err
+              Right t -> hPutStrLn inh t
+          `finally` cleanPipe (outh, inh)
+        do
+          res <- timeout 3000000 $ hGetLine outh
+          ans <- case res of
+                    Nothing -> Posix.signalProcess Posix.killProcess pid >> pure "Computation timed out..."
+                    Just t  -> pure t
+          Posix.getProcessStatus True False pid
+          pure [ans]
+    where
+      mkPipe = do
+        (i, o) <- Posix.createPipe
+        i' <- Posix.fdToHandle i
+        o' <- Posix.fdToHandle o
+        pure (i', o')
+      cleanPipe (i, o) = hClose i >> hClose o
 
 myTreeSelect :: X ()
 myTreeSelect = do
@@ -327,6 +345,4 @@ mySB = statusBarProp "xmobar" (pure myXmobarPP)
 main :: IO ()
 main = do
     dirs <- getDirectories
-    flip launch dirs
-     $ withSB mySB
-     $ myConfig
+    flip launch dirs $ withSB mySB myConfig
