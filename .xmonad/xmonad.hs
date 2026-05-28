@@ -134,6 +134,7 @@ myXPConfig = def { XP.font = "xft:Source Code Pro for Powerline-12"
                  , XP.height = 40
                  , XP.maxComplRows = Just 1
                  , XP.autoComplete = Nothing
+                 , XP.promptKeymap = M.alter (const $ Just $ XP.setInput "") (controlMask, xK_c) (XP.promptKeymap def)
                  }
 
 myTSConfig :: TS.TSConfig a
@@ -171,38 +172,52 @@ instance XP.XPrompt p => XP.XPrompt (OverridePrompt p) where
 namedShellPrompt = OverridePrompt XP.Shell
 namedPrompt = OverridePrompt NoPrompt
 
+evalXPConfig :: XP.XPConfig
+evalXPConfig = myXPConfig { promptKeymap = M.alter (const $ Just evalHaskellPromptEnter) (0, xK_Return) (promptKeymap myXPConfig) }
+
 data EvalPrompt = EvalPrompt
+
+evalHaskell :: String -> XP String
+evalHaskell expr = liftIO $ bracket_ uninstallSignalHandlers installSignalHandlers $
+  bracket mkPipe cleanPipe $ \(outh, inh) -> do
+    pid <- Posix.forkProcess $ do
+        res <- I.runInterpreter $ do
+          I.setImports ["Prelude", "Data.Ratio"]
+          val <- I.eval expr
+          typ <- I.typeOf expr
+          pure $ shorten 100 val
+        case res of
+          Left err -> hPrint inh err
+          Right t -> hPutStrLn inh t
+      `finally` cleanPipe (outh, inh)
+    do
+      res <- timeout 3000000 $ hGetLine outh
+      ans <- case res of
+                Nothing -> Posix.signalProcess Posix.killProcess pid >> pure "Computation timed out..."
+                Just t  -> pure t
+      Posix.getProcessStatus True False pid
+      pure ans
+  where
+    mkPipe = do
+      (i, o) <- Posix.createPipe
+      i' <- Posix.fdToHandle i
+      o' <- Posix.fdToHandle o
+      pure (i', o')
+    cleanPipe (i, o) = hClose i >> hClose o
+
+evalHaskellPromptEnter :: XP ()
+evalHaskellPromptEnter = do
+  expr <- XP.getInput
+  res <- evalHaskell expr
+  home <- liftIO $ getEnv "HOME"
+  liftIO $ hPutStrLn h res
+  XP.setInput res
+  liftIO $ hClose h
 
 instance XP.XPrompt EvalPrompt where
   showXPrompt EvalPrompt = "haskell> "
   commandToComplete _ = id
-  completionFunction EvalPrompt s =
-    bracket_ uninstallSignalHandlers installSignalHandlers $ do
-      bracket mkPipe cleanPipe $ \(outh, inh) -> do
-        pid <- Posix.forkProcess $ do
-            res <- I.runInterpreter $ do
-              I.setImports ["Prelude", "Data.Ratio"]
-              val <- I.eval s
-              typ <- I.typeOf s
-              pure $ shorten 100 val <> " :: " <> typ
-            case res of
-              Left err -> hPrint inh err
-              Right t -> hPutStrLn inh t
-          `finally` cleanPipe (outh, inh)
-        do
-          res <- timeout 3000000 $ hGetLine outh
-          ans <- case res of
-                    Nothing -> Posix.signalProcess Posix.killProcess pid >> pure "Computation timed out..."
-                    Just t  -> pure t
-          Posix.getProcessStatus True False pid
-          pure [ans]
-    where
-      mkPipe = do
-        (i, o) <- Posix.createPipe
-        i' <- Posix.fdToHandle i
-        o' <- Posix.fdToHandle o
-        pure (i', o')
-      cleanPipe (i, o) = hClose i >> hClose o
+  completionFunction EvalPrompt _ = pure []
 
 myTreeSelect :: X ()
 myTreeSelect = do
@@ -276,7 +291,7 @@ myKeymap =
     , ("C-M-S-h", popOldestHiddenWindow)
     , ("M--", incScreenWindowSpacing 2)
     , ("M-=", decScreenWindowSpacing 2)
-    , ("M-x", mkXPromptWithModes [XPT EvalPrompt] myXPConfig)
+    , ("M-x", mkXPromptWithModes [XPT EvalPrompt] evalXPConfig)
     , ("M-S-x", spawn $ terminalEmulator <> " -e ghci")
     , ("C-M-p", windows Copy.copyToAll)
     , ("C-M-S-p", Copy.killAllOtherCopies)
