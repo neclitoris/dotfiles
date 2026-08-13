@@ -5,6 +5,7 @@ import Data.Default
 import Data.List qualified as L
 import Data.Map qualified as M
 import Data.Monoid
+import Data.Ratio
 import Data.Tree
 import Data.Word
 import Language.Haskell.Interpreter qualified  as I
@@ -23,6 +24,7 @@ import XMonad hiding (recompile)
 import XMonad.Actions.CopyWindow qualified as Copy
 import XMonad.Actions.FlexibleResize qualified as Flex
 import XMonad.Actions.Navigation2D qualified as Nav
+import XMonad.Actions.SpawnOn (spawnAndDo)
 import XMonad.Actions.TreeSelect qualified as TS
 import XMonad.Config.Gnome
 import XMonad.Hooks.DynamicLog
@@ -99,6 +101,7 @@ myManageHook = composeOne
     [ title =? "Media viewer" -?> doFullFloat
     , className =? "alacritty-t-bg" -?> doIgnore
     , className =? "Xmessage" -?> doCenterFloat
+    , className =? "Weston Compositor" -?> doCenterFloat
     , shouldFloat -?> doCenterFloat
     , isFullscreen -?> doFullFloat
     ] <+> manageDocks
@@ -145,6 +148,10 @@ myTSConfig = def { TS.ts_font = "xft:Source Code Pro for Powerline-8"
                  , TS.ts_nodealt    = (base0, base2)
                  , TS.ts_extra      = base02
                  }
+
+spawnRead :: String -> X String
+spawnRead s = io $ bracket_ uninstallSignalHandlers installSignalHandlers $
+  P.readCreateProcess (P.shell s) ""
 
 desktop :: IO [FilePath]
 desktop = bracket_ uninstallSignalHandlers installSignalHandlers $ do
@@ -209,10 +216,7 @@ evalHaskellPromptEnter :: XP ()
 evalHaskellPromptEnter = do
   expr <- XP.getInput
   res <- evalHaskell expr
-  home <- liftIO $ getEnv "HOME"
-  liftIO $ hPutStrLn h res
   XP.setInput res
-  liftIO $ hClose h
 
 instance XP.XPrompt EvalPrompt where
   showXPrompt EvalPrompt = "haskell> "
@@ -254,7 +258,15 @@ myTreeSelect = do
 runInTerminal :: XP.XPConfig -> X ()
 runInTerminal c = do
   cmds <- io getCommands
-  mkXPrompt (namedShellPrompt "Run in terminal: ") c (getShellCompl cmds $ searchPredicate c) (spawn . printf "%s -e %s" terminalEmulator)
+  geom <- traverse (io . readIO) =<< (pure . words) =<< spawnRead "xdotool getdisplaygeometry"
+  [x, y] <- pure . zipWith (flip (%)) geom
+      =<< traverse (io . readIO)
+      =<< (pure . map (tail . dropWhile (/= ':')) . take 2 . words)
+      =<< spawnRead "xdotool getmouselocation"
+  let rect = W.RationalRect (min (3 % 4) $ max 0 (x - 1 % 8)) (min (3 % 4) $ max 0 (y - 1 % 8)) (1%4) (1%4)
+  mkXPrompt (namedShellPrompt "Run in terminal: ") c
+    (getShellCompl cmds $ searchPredicate c)
+    (spawnAndDo (doRectFloat rect) . printf "%s -e %s" terminalEmulator)
 
 recompile :: MonadIO m => m ()
 recompile = io $ bracket_ uninstallSignalHandlers installSignalHandlers $ void $ do
@@ -349,7 +361,7 @@ myConfig =
       , terminal           = terminalEmulator
       , startupHook        = myStartupHook
       , layoutHook         = myLayoutHook
-      , manageHook         = myManageHook <+> def
+      , manageHook         = manageSpawn <+> myManageHook <+> def
       , workspaces         = myWorkspaces
       , borderWidth        = 0
       } `additionalKeysP` myKeymap
