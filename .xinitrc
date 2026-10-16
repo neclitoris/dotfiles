@@ -1,8 +1,11 @@
 #!/usr/bin/zsh
 
 export GTK_THEME="Material-Black-Blueberry-Suru"
+export XDG_CURRENT_DESKTOP=GNOME
 
 exec >~/.xsession-errors 2>&1
+
+dbus-update-activation-environment --systemd DISPLAY XDG_CURRENT_DESKTOP &
 
 xrandr --setprovideroutputsource modesetting NVIDIA-0
 xrandr --auto

@@ -374,6 +374,8 @@ augroup vimrc
     autocmd BufRead,BufWritePre,FileWritePre * silent! %s/\(\\\@<!\s\)\+$//
 augroup END
 
+autocmd BufNewFile,BufRead *.pl set filetype=prolog
+
 set noswapfile
 
 " set guifont=Hasklig:h15
