@@ -4,7 +4,7 @@ zparseopts -- c=clip m:=mode
 
 case "${clip[@]}" in
     -c)
-        append=" | tee /tmp/img.png | xclip -target image/png -sel clipboard"
+        append=" | tee $(mktemp /tmp/img_XXXXXXXX.png) | xclip -target image/png -sel clipboard"
         ;;
     "")
         mkdir -p "$HOME/pic/Screenshots"
