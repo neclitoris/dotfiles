@@ -1,7 +1,5 @@
 # environment
 source "$HOME/.profile"
-source "$HOME/.environment"
-source "$HOME/.path"
 source "$HOME/.aliases"
 
 # zsh init
@@ -39,11 +37,6 @@ source /usr/share/fzf/key-bindings.zsh
 
 setopt nosharehistory
 unsetopt complete_aliases
-
-if [ -e /home/neclitoris/.nix-profile/etc/profile.d/nix.sh ]; then . /home/neclitoris/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
-
-# The next line updates PATH for Yandex Cloud CLI.
-if [ -f '/home/neclitoris/yandex-cloud/path.bash.inc' ]; then source '/home/neclitoris/yandex-cloud/path.bash.inc'; fi
 
 # The next line enables shell command completion for yc.
 if [ -f '/home/neclitoris/yandex-cloud/completion.zsh.inc' ]; then source '/home/neclitoris/yandex-cloud/completion.zsh.inc'; fi

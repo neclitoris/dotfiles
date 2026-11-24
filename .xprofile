@@ -1,14 +1,14 @@
 #!/usr/bin/zsh
 
+
 [ -f ~/.config/zsh/.zshenv ] && . ~/.config/zsh/.zshenv
-[ -f ~/.zshrc ] && . ~/.zshrc
+[ -f ~/.profile ] && . ~/.profile
+dbus-update-activation-environment --systemd DISPLAY XAUTHORITY XDG_CURRENT_DESKTOP &
 
 export GTK_THEME="Material-Black-Blueberry-Suru"
 export XDG_CURRENT_DESKTOP=GNOME
 
 exec >~/.xsession-errors 2>&1
-
-dbus-update-activation-environment --systemd DISPLAY XDG_CURRENT_DESKTOP &
 
 xsetroot -cursor_name left_ptr
 # xhost +si:localuser:root

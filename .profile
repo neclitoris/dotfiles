@@ -15,3 +15,6 @@ if [ -n "$BASH_VERSION" ]; then
         source "$HOME/.bashrc"
     fi
 fi
+
+source "$HOME/.environment"
+source "$HOME/.path"
