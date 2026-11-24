@@ -1,0 +1,27 @@
+#!/usr/bin/zsh
+
+[ -f ~/.config/zsh/.zshenv ] && . ~/.config/zsh/.zshenv
+[ -f ~/.zshrc ] && . ~/.zshrc
+
+export GTK_THEME="Material-Black-Blueberry-Suru"
+export XDG_CURRENT_DESKTOP=GNOME
+
+exec >~/.xsession-errors 2>&1
+
+dbus-update-activation-environment --systemd DISPLAY XDG_CURRENT_DESKTOP &
+
+xsetroot -cursor_name left_ptr
+# xhost +si:localuser:root
+
+[[ -f ~/.Xresources ]] && xrdb -merge -I$HOME ~/.Xresources
+
+picom &
+autorandr --change
+nitrogen --restore &
+
+killall notification-manager
+dunst &
+stalonetray &
+/usr/lib/geoclue-2.0/demos/agent &
+/usr/lib/xfce-polkit/xfce-polkit &
+acpi_handler.sh &
